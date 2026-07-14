@@ -1,0 +1,1927 @@
+<!DOCTYPE html>
+<html lang="zh-TW">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>AI短影音競賽腳本創作 SaaS 平台 - TONY STUDIO</title>
+    <!-- Tailwind CSS -->
+    <script src="https://cdn.tailwindcss.com"></script>
+    <!-- Lucide Icons -->
+    <script src="https://unpkg.com/lucide@latest"></script>
+    <!-- PDF.js -->
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/pdf.js/3.4.120/pdf.min.js"></script>
+    <!-- Mammoth.js for Word files -->
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/mammoth/1.6.0/mammoth.browser.min.js"></script>
+    
+    <style>
+        @import url('https://fonts.googleapis.com/css2?family=Noto+Sans+TC:wght@300;400;500;700&display=swap');
+        body {
+            font-family: 'Noto Sans TC', sans-serif;
+            background-color: #f8fafc;
+        }
+        .slate-gradient {
+            background: linear-gradient(135deg, #0f172a 0%, #1e293b 50%, #334155 100%);
+        }
+        .glass-panel {
+            background: rgba(255, 255, 255, 0.05);
+            backdrop-filter: blur(16px);
+            -webkit-backdrop-filter: blur(16px);
+            border: 1px solid rgba(255, 255, 255, 0.1);
+        }
+        .custom-scrollbar::-webkit-scrollbar {
+            width: 6px;
+        }
+        .custom-scrollbar::-webkit-scrollbar-track {
+            background: #f1f5f9;
+        }
+        .custom-scrollbar::-webkit-scrollbar-thumb {
+            background: #cbd5e1;
+            border-radius: 10px;
+        }
+        .loading-dots:after {
+            content: '.';
+            animation: dots 1s steps(5, end) infinite;
+        }
+        @keyframes dots {
+            0%, 20% { content: '.'; }
+            40% { content: '..'; }
+            60% { content: '...'; }
+            80%, 100% { content: ''; }
+        }
+        /* Fade In & Scale Animation */
+        .fade-in-view { animation: fadeIn 0.4s ease-in-out forwards; }
+        @keyframes fadeIn { from { opacity: 0; transform: translateY(10px); } to { opacity: 1; transform: translateY(0); } }
+        .scale-in-center { animation: scaleInCenter 0.3s cubic-bezier(0.250, 0.460, 0.450, 0.940) both; }
+        @keyframes scaleInCenter { 0% { transform: scale(0.9); opacity: 0; } 100% { transform: scale(1); opacity: 1; } }
+    </style>
+</head>
+<body class="text-slate-900">
+
+    <!-- ========================================== -->
+    <!-- 1. AUTH GATE (登入/註冊/忘記密碼區) -->
+    <!-- ========================================== -->
+    <div id="authWorkspace" class="min-h-[100dvh] slate-gradient flex items-center justify-center p-4 transition-all">
+        <div class="w-full max-w-md glass-panel rounded-3xl p-8 shadow-2xl relative overflow-hidden">
+            <!-- Background Decorative Blur -->
+            <div class="absolute -top-20 -right-20 w-40 h-40 bg-amber-500 rounded-full mix-blend-multiply filter blur-3xl opacity-20"></div>
+            <div class="absolute -bottom-20 -left-20 w-40 h-40 bg-indigo-500 rounded-full mix-blend-multiply filter blur-3xl opacity-20"></div>
+            
+            <div class="relative z-10">
+                <div class="text-center mb-8">
+                    <img src="https://i.postimg.cc/fT2sQW09/1.png" alt="Logo" class="h-14 mx-auto mb-4 drop-shadow-md">
+                    <h1 class="text-2xl font-bold text-white tracking-wide">AI 短影音競賽腳本<span class="text-amber-400">創作平台</span></h1>
+                    <p class="text-sm text-slate-400 mt-2">Powered by TONY STUDIO</p>
+                </div>
+
+                <div id="authAlert" class="hidden mb-6 p-3 rounded-xl text-sm font-medium border text-center transition-all"></div>
+
+                <form id="authForm" onsubmit="handleAuth(event)" class="space-y-5">
+                    
+                    <!-- 註冊專屬欄位：真實姓名與身分 -->
+                    <div id="registerFields" class="hidden space-y-5">
+                        <div>
+                            <label class="block text-xs font-bold text-slate-300 uppercase tracking-wider mb-2">真實姓名 Real Name</label>
+                            <div class="relative">
+                                <i data-lucide="user" class="absolute left-3 top-3 w-5 h-5 text-slate-400"></i>
+                                <input type="text" id="authName" placeholder="請輸入您的真實姓名" class="w-full bg-slate-900/50 border border-slate-700 text-white rounded-xl pl-10 pr-4 py-3 focus:ring-2 focus:ring-amber-500 outline-none transition-all placeholder-slate-600">
+                            </div>
+                        </div>
+                        <div>
+                            <label class="block text-xs font-bold text-slate-300 uppercase tracking-wider mb-2">身分 Identity</label>
+                            <div class="relative">
+                                <i data-lucide="graduation-cap" class="absolute left-3 top-3 w-5 h-5 text-slate-400"></i>
+                                <select id="authIdentity" class="w-full bg-slate-900/50 border border-slate-700 text-white rounded-xl pl-10 pr-4 py-3 focus:ring-2 focus:ring-amber-500 outline-none transition-all appearance-none cursor-pointer">
+                                    <option value="TONY老師學員" class="text-slate-900">TONY老師學員</option>
+                                    <option value="非學員(一般訪客)" class="text-slate-900">非學員(一般訪客)</option>
+                                </select>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div>
+                        <label class="block text-xs font-bold text-slate-300 uppercase tracking-wider mb-2">電子郵件 Email</label>
+                        <div class="relative">
+                            <i data-lucide="mail" class="absolute left-3 top-3 w-5 h-5 text-slate-400"></i>
+                            <input type="email" id="authEmail" required placeholder="mindnodeai@gmail.com" class="w-full bg-slate-900/50 border border-slate-700 text-white rounded-xl pl-10 pr-4 py-3 focus:ring-2 focus:ring-amber-500 outline-none transition-all placeholder-slate-600">
+                        </div>
+                    </div>
+                    <div id="passwordField">
+                        <label class="block text-xs font-bold text-slate-300 uppercase tracking-wider mb-2">密碼 Password</label>
+                        <div class="relative">
+                            <i data-lucide="lock" class="absolute left-3 top-3 w-5 h-5 text-slate-400"></i>
+                            <input type="password" id="authPassword" placeholder="••••••••" class="w-full bg-slate-900/50 border border-slate-700 text-white rounded-xl pl-10 pr-10 py-3 focus:ring-2 focus:ring-amber-500 outline-none transition-all placeholder-slate-600">
+                            <button type="button" onclick="togglePasswordVisibility()" class="absolute right-3 top-3.5 text-slate-400 hover:text-white transition-colors" title="顯示/隱藏密碼">
+                                <i data-lucide="eye" id="pwdEyeIcon" class="w-4 h-4"></i>
+                            </button>
+                        </div>
+                    </div>
+                    
+                    <!-- 溫馨提醒區域 -->
+                    <div id="spamReminder" class="hidden flex items-start gap-2 bg-amber-900/30 border border-amber-500/30 p-3 rounded-xl mt-2">
+                        <i data-lucide="info" class="w-4 h-4 text-amber-400 shrink-0 mt-0.5"></i>
+                        <p class="text-[11px] text-amber-200 leading-relaxed">溫馨提醒：註冊確認信或密碼重設信有時會跑到<span class="font-bold text-amber-400">「垃圾郵件匣」</span>，請記得前往確認唷！</p>
+                    </div>
+
+                    <button type="submit" id="authSubmitBtn" class="w-full bg-amber-500 hover:bg-amber-400 text-slate-900 font-bold text-sm py-3.5 rounded-xl transition-all shadow-[0_0_15px_rgba(245,158,11,0.4)] active:scale-95 flex justify-center items-center gap-2 mt-4">
+                        <i data-lucide="log-in" class="w-4 h-4"></i> <span>登入系統</span>
+                    </button>
+                </form>
+
+                <div class="mt-6 text-center space-y-3">
+                    <button type="button" onclick="toggleAuthMode('register')" id="toggleAuthBtn" class="text-sm text-slate-300 hover:text-white transition-colors">還沒有帳號？<span class="text-amber-400 font-bold border-b border-amber-400/30">立即註冊</span></button>
+                    <div class="block">
+                        <button type="button" onclick="toggleAuthMode('reset')" id="forgotPwdBtn" class="text-xs text-slate-500 hover:text-slate-300 transition-colors">忘記密碼？</button>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- ========================================== -->
+    <!-- 2. MAIN APP WORKSPACE (應用程式區) -->
+    <!-- ========================================== -->
+    <div id="appWorkspace" class="hidden flex-col min-h-[100dvh] bg-[#f8fafc] fade-in-view">
+        
+        <!-- 核彈級解鎖：淨空導覽列，避開隱形死區 -->
+        <nav class="bg-slate-900 border-b border-slate-800 px-6 py-4 flex justify-center shadow-md w-full relative z-50">
+            <div class="flex items-center gap-3">
+                <img src="https://i.postimg.cc/fT2sQW09/1.png" alt="Logo" class="h-10">
+                <h1 class="text-xl font-bold tracking-tight text-white">AI短影音競賽腳本創作 <span class="text-amber-400">APP</span></h1>
+                <span class="ml-2 bg-gradient-to-r from-amber-500 to-orange-500 text-white text-[10px] font-bold px-2.5 py-1 rounded-full shadow-[0_0_10px_rgba(245,158,11,0.5)] border border-amber-300/50 whitespace-nowrap">Gemini 3.5 Flash 正式版</span>
+            </div>
+        </nav>
+
+        <main class="max-w-7xl mx-auto p-4 md:p-6 grid grid-cols-1 lg:grid-cols-12 gap-6 w-full flex-1">
+            <!-- Left Column: Config & Upload -->
+            <aside class="lg:col-span-4 flex flex-col gap-6">
+                
+                <!-- 專屬系統控制面板 -->
+                <section class="bg-slate-900 rounded-2xl p-6 shadow-lg border border-slate-800 relative overflow-hidden">
+                    <div class="absolute -right-6 -top-6 opacity-10 pointer-events-none">
+                        <i data-lucide="shield" class="w-32 h-32 text-amber-500"></i>
+                    </div>
+                    <div class="relative z-10 space-y-4">
+                        <div class="flex items-center justify-between border-b border-slate-700 pb-4">
+                            <div>
+                                <p id="navUserEmail" class="text-sm font-bold text-white"></p>
+                                <p id="navUserRole" class="text-[10px] text-amber-400 uppercase tracking-wider mt-1"></p>
+                            </div>
+                            <div class="flex gap-2">
+                                <button id="navAdminBtn" onclick="switchView('admin')" class="hidden p-2 bg-indigo-600 hover:bg-indigo-500 text-white rounded-lg transition-colors shadow-sm" title="進入管理後台">
+                                    <i data-lucide="layout-dashboard" class="w-4 h-4"></i>
+                                </button>
+                                <button onclick="handleLogout()" class="p-2 bg-rose-500/20 text-rose-400 hover:bg-rose-500 hover:text-white rounded-lg transition-all" title="登出系統">
+                                    <i data-lucide="log-out" class="w-4 h-4"></i>
+                                </button>
+                            </div>
+                        </div>
+                        
+                        <div>
+                            <label class="block text-xs font-bold text-slate-400 uppercase tracking-wider mb-2">Gemini API 金鑰設定</label>
+                            <div id="apiContainer" class="flex items-center gap-2 bg-slate-800 rounded-xl px-3 py-2.5 border border-slate-700 transition-all">
+                                <div id="apiStatusLight" class="w-2 h-2 rounded-full bg-red-500 animate-pulse shadow-[0_0_8px_rgba(239,68,68,0.6)]" title="未輸入或無效的 API Key"></div>
+                                <i data-lucide="key" class="w-4 h-4 text-slate-400"></i>
+                                <input type="password" id="apiKey" placeholder="貼上 Google API Key..." class="bg-transparent border-none outline-none text-sm w-full text-white placeholder-slate-500">
+                            </div>
+                            <div class="mt-2 text-right">
+                                <a href="https://aistudio.google.com/app/apikey" target="_blank" class="inline-flex items-center gap-1 text-[11px] text-amber-400 hover:text-amber-300 transition-colors bg-slate-800 px-2 py-1 rounded-md">
+                                    <i data-lucide="external-link" class="w-3 h-3"></i> 免費獲取金鑰
+                                </a>
+                            </div>
+                        </div>
+                    </div>
+                </section>
+
+                <!-- Parameters Section -->
+                <section class="bg-white rounded-2xl p-6 shadow-sm border border-slate-200">
+                    <div class="flex items-center gap-2 mb-6">
+                        <div class="p-2 bg-slate-100 rounded-lg text-slate-700">
+                            <i data-lucide="settings-2" class="w-5 h-5"></i>
+                        </div>
+                        <h2 class="text-lg font-bold">腳本需求設定</h2>
+                    </div>
+
+                    <div class="space-y-5">
+                        <div class="grid grid-cols-2 gap-4">
+                            <div>
+                                <label class="block text-sm font-medium text-slate-600 mb-2">影片時長 (15-180秒)</label>
+                                <div class="relative">
+                                    <input type="number" id="videoLength" min="1" max="600" value="60" class="w-full bg-slate-50 border border-slate-200 rounded-xl px-4 py-2.5 focus:ring-2 focus:ring-slate-400 outline-none transition-all">
+                                    <span class="absolute right-4 top-2.5 text-slate-400 text-sm">SEC</span>
+                                </div>
+                                <p id="videoLengthStatus" class="hidden text-[10px] text-green-600 font-bold mt-1.5 flex items-center gap-1">
+                                    <i data-lucide="check-circle" class="w-3 h-3"></i> 已同步音檔/影片時長
+                                </p>
+                            </div>
+                            <div>
+                                <label class="block text-sm font-medium text-slate-600 mb-2">影片畫面比例</label>
+                                <select id="aspectRatio" class="w-full bg-slate-50 border border-slate-200 rounded-xl px-4 py-2.5 focus:ring-2 focus:ring-slate-400 outline-none appearance-none">
+                                    <option value="16:9">16:9 (橫式影片)</option>
+                                    <option value="9:16">9:16 (直式短影音)</option>
+                                </select>
+                            </div>
+                        </div>
+
+                        <div>
+                            <label class="block text-sm font-medium text-slate-600 mb-2">影片腳本情緒風格</label>
+                            <select id="scriptStyle" onchange="toggleCustomStyle()" class="w-full bg-slate-50 border border-slate-200 rounded-xl px-4 py-2.5 focus:ring-2 focus:ring-slate-400 outline-none appearance-none">
+                                <option value="音樂MV風格">音樂MV風格 🎵</option>
+                                <option value="熱血勵志">熱血勵志</option>
+                                <option value="幽默風趣">幽默風趣</option>
+                                <option value="感人肺腑">感人肺腑</option>
+                                <option value="專業商務">專業商務</option>
+                                <option value="懸疑反轉">懸疑反轉</option>
+                                <option value="日常紀錄">日常紀錄</option>
+                                <option value="永續減碳零廢棄環保">永續減碳零廢棄環保</option>
+                                <option value="地球永續生物多樣性">地球永續生物多樣性</option>
+                                <option value="其他">其他 (自行填寫)</option>
+                            </select>
+                            <input type="text" id="customScriptStyle" class="hidden mt-3 w-full bg-indigo-50 border border-indigo-200 rounded-xl px-4 py-2 focus:ring-2 focus:ring-indigo-400 outline-none transition-all text-sm placeholder-indigo-300 text-indigo-900" placeholder="請輸入您想要的腳本情緒風格...">
+                        </div>
+
+                        <div>
+                            <label class="block text-sm font-medium text-slate-600 mb-2">繪畫視覺風格</label>
+                            <select id="artStyle" class="w-full bg-slate-50 border border-slate-200 rounded-xl px-4 py-2.5 focus:ring-2 focus:ring-slate-400 outline-none">
+                                <option value="4K 電影寫實">4K 電影寫實</option>
+                                <option value="3D 迪士尼卡通">3D 迪士尼卡通</option>
+                                <option value="日式動漫風">日式動漫風</option>
+                                <option value="極簡扁平">極簡扁平</option>
+                                <option value="賽博龐克">賽博龐克</option>
+                                <option value="古典水墨">古典水墨</option>
+                            </select>
+                        </div>
+
+                        <div>
+                            <label class="block text-sm font-medium text-slate-600 mb-2">目標生成平台 <span class="text-xs text-amber-600 font-bold ml-1">(SMART 時間模組)</span></label>
+                            <div class="grid grid-cols-2 md:grid-cols-3 gap-2">
+                                <button onclick="setPlatform('KLINGAI', this)" class="platform-btn px-4 py-2 text-sm border border-slate-800 rounded-xl bg-slate-800 text-white hover:bg-slate-700 transition-colors">KLINGAI</button>
+                                <button onclick="setPlatform('Gemini Omni', this)" class="platform-btn px-4 py-2 text-sm border border-slate-200 rounded-xl bg-white text-slate-600 hover:bg-slate-50 transition-colors">Gemini Omni</button>
+                                <button onclick="setPlatform('Runway', this)" class="platform-btn px-4 py-2 text-sm border border-slate-200 rounded-xl bg-white text-slate-600 hover:bg-slate-50 transition-colors">Runway</button>
+                                <button onclick="setPlatform('AIReel', this)" class="platform-btn px-4 py-2 text-sm border border-slate-200 rounded-xl bg-white text-slate-600 hover:bg-slate-50 transition-colors">AIReel</button>
+                                <button onclick="setPlatform('Seedance', this)" class="platform-btn px-4 py-2 text-sm border border-slate-200 rounded-xl bg-white text-slate-600 hover:bg-slate-50 transition-colors">Seedance</button>
+                                <button onclick="setPlatform('Grok', this)" class="platform-btn px-4 py-2 text-sm border border-slate-200 rounded-xl bg-white text-slate-600 hover:bg-slate-50 transition-colors">Grok</button>
+                            </div>
+                            <div id="platformDescription" class="mt-3 text-xs text-slate-500 bg-slate-50 p-3 rounded-lg border border-slate-200 leading-relaxed transition-all">
+                                <span class="font-bold text-slate-700">【KLINGAI 專屬規則】</span><br>時間最為彈性，可依照內容自由調整 3 秒到 15 秒。
+                            </div>
+                        </div>
+
+                        <div>
+                            <label class="block text-sm font-medium text-slate-600 mb-2">腳本需求補充說明 <span class="text-xs text-indigo-600 ml-1">(核心觀點)</span></label>
+                            <textarea id="additionalRequirements" rows="4" placeholder="請在此填寫核心觀點的不同之處，AI 將會以此建構整個故事的細膩度與深度..." class="w-full bg-slate-50 border border-slate-200 rounded-xl px-4 py-2.5 focus:ring-2 focus:ring-slate-400 outline-none transition-all custom-scrollbar"></textarea>
+                        </div>
+                    </div>
+                </section>
+
+                <!-- File Upload Section -->
+                <section class="bg-white rounded-2xl p-6 shadow-sm border border-slate-200">
+                    <div class="flex items-center gap-2 mb-4">
+                        <div class="p-2 bg-slate-100 rounded-lg text-slate-700">
+                            <i data-lucide="file-up" class="w-5 h-5"></i>
+                        </div>
+                        <h2 class="text-lg font-bold">上傳競賽簡章、音樂MP3、影片MP4或相關資料</h2>
+                    </div>
+                    
+                    <div id="dropZone" class="border-2 border-dashed border-slate-200 rounded-2xl p-8 text-center hover:border-slate-400 transition-all cursor-pointer group">
+                        <input type="file" id="fileInput" multiple accept=".pdf,.docx,.txt,.jpg,.png,.mp3,.mp4" class="hidden">
+                        <div class="flex flex-col items-center gap-3">
+                            <i data-lucide="cloud-upload" class="w-10 h-10 text-slate-300 group-hover:text-slate-500 transition-colors"></i>
+                            <p class="text-sm text-slate-500">拖曳檔案至此或 <span class="text-slate-800 font-bold">點擊上傳</span></p>
+                            <p class="text-[11px] text-slate-400 font-medium">支援 PDF, WORD, TXT, 圖檔, MP3, MP4 (影音限20MB內)</p>
+                        </div>
+                    </div>
+
+                    <!-- 網頁與 YouTube 連結輸入區 -->
+                    <div class="mt-4 flex gap-2">
+                        <div class="relative flex-1">
+                            <i data-lucide="link" class="absolute left-3 top-2.5 w-4 h-4 text-slate-400"></i>
+                            <input type="url" id="linkInput" placeholder="貼上 YouTube 或參考網頁連結..." class="w-full bg-slate-50 border border-slate-200 rounded-xl pl-9 pr-3 py-2 text-sm focus:ring-2 focus:ring-indigo-400 outline-none transition-all">
+                        </div>
+                        <button onclick="addLink()" class="px-4 py-2 bg-indigo-50 hover:bg-indigo-100 text-indigo-700 border border-indigo-200 rounded-xl text-sm font-bold transition-colors whitespace-nowrap">新增連結</button>
+                    </div>
+
+                    <div id="fileList" class="mt-4 space-y-2 max-h-40 overflow-y-auto custom-scrollbar">
+                        <!-- Files & Links will appear here -->
+                    </div>
+                </section>
+
+                <!-- History Section -->
+                <section class="bg-white rounded-2xl p-6 shadow-sm border border-slate-200">
+                    <div class="flex items-center justify-between mb-4">
+                        <div class="flex items-center gap-2">
+                            <div class="p-2 bg-slate-100 rounded-lg text-slate-700">
+                                <i data-lucide="history" class="w-5 h-5"></i>
+                            </div>
+                            <h2 class="text-lg font-bold">歷史腳本紀錄</h2>
+                        </div>
+                        <div class="flex gap-2">
+                            <button onclick="exportOfflineBackup()" class="p-1.5 bg-slate-100 text-slate-600 hover:bg-slate-200 rounded-md transition-colors" title="離線備份 (匯出 JSON)">
+                                <i data-lucide="download" class="w-4 h-4"></i>
+                            </button>
+                            <button onclick="document.getElementById('importBackupInput').click()" class="p-1.5 bg-slate-100 text-slate-600 hover:bg-slate-200 rounded-md transition-colors" title="載入備份 (匯入 JSON)">
+                                <i data-lucide="upload" class="w-4 h-4"></i>
+                            </button>
+                            <input type="file" id="importBackupInput" accept=".json" class="hidden" onchange="importOfflineBackup(event)">
+                        </div>
+                    </div>
+
+                    <!-- 隨時查詢腳本的 Search Bar -->
+                    <div class="mb-3 relative">
+                        <i data-lucide="search" class="absolute left-3 top-2.5 w-4 h-4 text-slate-400"></i>
+                        <input type="text" id="historySearchInput" onkeyup="searchHistory()" placeholder="搜尋腳本標題或日期..." class="w-full bg-slate-50 border border-slate-200 rounded-lg pl-9 pr-3 py-2 text-sm focus:ring-2 focus:ring-amber-400 outline-none transition-all">
+                    </div>
+
+                    <div class="text-[10px] text-slate-400 mb-2 flex items-center gap-1 hidden" id="cloudSyncStatus">
+                        <!-- 動態雲端狀態 -->
+                    </div>
+                    <div id="historyList" class="space-y-2 max-h-48 overflow-y-auto custom-scrollbar">
+                        <!-- History items will be injected here -->
+                        <div class="text-center py-4 text-xs text-slate-400">尚無歷史紀錄</div>
+                    </div>
+                </section>
+
+                <!-- Creator Profile -->
+                <section class="bg-slate-800 text-white rounded-2xl p-6 shadow-lg overflow-hidden relative">
+                    <div class="relative z-10">
+                        <div class="flex items-center gap-4 mb-4">
+                            <img src="https://i.postimg.cc/Gh8Zt7SX/S_56844323.jpg" alt="TONY 老師" class="w-16 h-16 rounded-full border-2 border-slate-400 object-cover">
+                            <div>
+                                <h3 class="font-bold text-lg">TONY 楊文澤 老師</h3>
+                                <p class="text-xs text-slate-300">資深數位行銷科技顧問 / AI 創作者</p>
+                            </div>
+                        </div>
+                        <div class="text-xs text-slate-300 space-y-1 leading-relaxed">
+                            <p>▪ 龍華科大 數位行銷講師</p>
+                            <p>▪ 智策慧 品牌行銷科技顧問</p>
+                            <p>▪ 前宏碁集團建碁 AOPEN 全球行銷總監</p>
+                            <p>▪ 台大 EMBA / 美國 ASU 互動多媒體設計</p>
+                        </div>
+                    </div>
+                    <div class="absolute -right-10 -bottom-10 opacity-10">
+                        <i data-lucide="users" class="w-40 h-40"></i>
+                    </div>
+                </section>
+            </aside>
+
+            <!-- Right Column: Output -->
+            <div class="lg:col-span-8 flex flex-col gap-6">
+                
+                <div class="bg-white rounded-2xl shadow-sm border border-slate-200 flex flex-col h-[calc(100vh-180px)]">
+                    <!-- Toolbar -->
+                    <div class="p-4 border-b border-slate-100 flex items-center justify-between bg-slate-50/50 rounded-t-2xl">
+                        <div class="flex items-center gap-2">
+                            <div class="w-3 h-3 rounded-full bg-red-400"></div>
+                            <div class="w-3 h-3 rounded-full bg-amber-400"></div>
+                            <div class="w-3 h-3 rounded-full bg-green-400"></div>
+                            <span class="ml-2 text-xs font-medium text-slate-400 uppercase tracking-widest">Script Output</span>
+                        </div>
+                        <div class="flex items-center gap-2">
+                            <button onclick="downloadScript()" id="downloadBtn" class="hidden flex items-center gap-1.5 px-3 py-1.5 text-xs font-medium text-slate-600 hover:bg-white rounded-lg transition-all border border-transparent hover:border-slate-200">
+                                <i data-lucide="download" class="w-3.5 h-3.5"></i> 匯出 Word
+                            </button>
+                            <button onclick="generateScript()" id="genBtn" class="flex items-center gap-1.5 px-5 py-2 bg-slate-800 text-white rounded-xl text-sm font-bold hover:bg-slate-700 transition-all shadow-md active:scale-95 disabled:opacity-50 disabled:pointer-events-none">
+                                <i data-lucide="sparkles" class="w-4 h-4"></i> 生成腳本
+                            </button>
+                        </div>
+                    </div>
+
+                    <!-- Display Area -->
+                    <div id="outputArea" class="flex-1 overflow-y-auto p-6 custom-scrollbar bg-[radial-gradient(#e2e8f0_1px,transparent_1px)] [background-size:20px_20px]">
+                        <div id="emptyState" class="h-full flex flex-col items-center justify-center text-slate-400 gap-4">
+                            <i data-lucide="scroll-text" class="w-16 h-16 opacity-20"></i>
+                            <div class="text-center">
+                                <p class="font-medium text-slate-500">尚未生成內容</p>
+                                <p class="text-sm">設定參數並點擊「生成腳本」按鈕開始創作</p>
+                            </div>
+                        </div>
+                        
+                        <div id="loadingState" class="hidden h-full flex flex-col items-center justify-center gap-5">
+                            <div class="relative">
+                                <div class="w-16 h-16 border-4 border-slate-200 border-t-amber-500 rounded-full animate-spin"></div>
+                                <i data-lucide="brain-circuit" class="w-8 h-8 text-amber-500 absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2"></i>
+                            </div>
+                            <div class="text-center space-y-2">
+                                <p class="text-slate-800 font-bold text-lg loading-dots">Gemini 3.5 Flash 深度推理中，依據平台特性建構分鏡</p>
+                                <p class="text-slate-500 text-sm bg-slate-100 py-1.5 px-4 rounded-full inline-block">
+                                    耗時約 5~20 秒，目前已執行 <span id="timerText" class="font-mono text-amber-600 font-bold text-base">0</span> 秒...
+                                </p>
+                            </div>
+                        </div>
+
+                        <div id="scriptContent" class="hidden space-y-8 animate-in fade-in duration-500">
+                            <!-- Dynamic Content Injection -->
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Footer -->
+                <footer class="text-center py-4 border-t border-slate-200 mt-auto">
+                    <p class="text-xs text-slate-400 tracking-wide uppercase">
+                        © 2026 TONY STUDIO. 本教材由 TONY STUDIO 楊文澤顧問設計. All Rights Reserved.
+                    </p>
+                </footer>
+            </div>
+        </main>
+    </div>
+
+    <!-- ========================================== -->
+    <!-- 3. ADMIN DASHBOARD (專屬管理者後台) -->
+    <!-- ========================================== -->
+    <div id="adminWorkspace" class="hidden min-h-[100dvh] bg-slate-50 fade-in-view">
+        
+        <!-- 核彈級解鎖：淨空後台導覽列 -->
+        <nav class="bg-slate-900 border-b border-slate-800 px-6 py-4 flex justify-center shadow-md w-full relative z-50">
+            <div class="flex items-center gap-3">
+                <i data-lucide="shield-check" class="w-8 h-8 text-indigo-400"></i>
+                <h1 class="text-xl font-bold tracking-tight text-white">SaaS 管理者後台</h1>
+                <span class="ml-2 bg-gradient-to-r from-amber-500 to-orange-500 text-white text-[10px] font-bold px-2.5 py-1 rounded-full shadow-[0_0_10px_rgba(245,158,11,0.5)] border border-amber-300/50 whitespace-nowrap">Gemini 3.5 Flash 正式版</span>
+            </div>
+        </nav>
+
+        <main class="max-w-[1400px] mx-auto p-4 md:p-6 mt-2 space-y-6">
+            <!-- 系統營運控制中心 -->
+            <div class="flex flex-col md:flex-row items-center justify-between gap-4 bg-white p-4 md:px-6 rounded-2xl shadow-sm border border-slate-200">
+                <h2 class="text-lg font-bold text-slate-800 hidden md:block">系統營運控制中心</h2>
+                <div class="flex w-full md:w-auto gap-3">
+                    <button onclick="exportCSV()" class="flex-1 md:flex-none px-4 py-2.5 bg-emerald-600 hover:bg-emerald-500 text-white text-sm font-bold rounded-xl transition-colors flex items-center justify-center gap-2 shadow-sm">
+                        <i data-lucide="download-cloud" class="w-4 h-4"></i> 匯出 CSV 數據
+                    </button>
+                    <button onclick="switchView('app')" class="flex-1 md:flex-none px-4 py-2.5 bg-slate-700 hover:bg-slate-600 text-white text-sm font-bold rounded-xl transition-colors flex items-center justify-center gap-2 shadow-sm">
+                        <i data-lucide="arrow-left" class="w-4 h-4"></i> 返回主程式
+                    </button>
+                </div>
+            </div>
+
+            <!-- AI 數據分析區塊 -->
+            <div class="bg-white rounded-2xl shadow-sm border border-slate-200 overflow-hidden">
+                <div class="p-6 border-b border-slate-100 flex items-center justify-between bg-slate-50">
+                    <h2 class="text-lg font-bold text-slate-800 flex items-center gap-2">
+                        <i data-lucide="bar-chart-2" class="w-5 h-5 text-amber-500"></i> 營運數據 AI 洞察分析
+                    </h2>
+                    <span class="text-xs font-bold bg-amber-100 text-amber-700 px-3 py-1 rounded-full">Gemini 3.5 Flash Powered</span>
+                </div>
+                <div class="p-6">
+                    <div class="flex flex-col md:flex-row items-end gap-4 mb-4">
+                        <div class="w-full md:w-auto">
+                            <label class="block text-xs font-bold text-slate-500 uppercase tracking-wider mb-2">起始日期 Start Date</label>
+                            <input type="date" id="adminStartDate" class="w-full bg-slate-50 border border-slate-200 rounded-xl px-4 py-2.5 focus:ring-2 focus:ring-amber-400 outline-none text-sm text-slate-700">
+                        </div>
+                        <div class="w-full md:w-auto">
+                            <label class="block text-xs font-bold text-slate-500 uppercase tracking-wider mb-2">結束日期 End Date</label>
+                            <input type="date" id="adminEndDate" class="w-full bg-slate-50 border border-slate-200 rounded-xl px-4 py-2.5 focus:ring-2 focus:ring-amber-400 outline-none text-sm text-slate-700">
+                        </div>
+                        <button onclick="runAdminAIAnalysis()" id="btnAdminAI" class="w-full md:w-auto px-6 py-2.5 bg-slate-800 hover:bg-slate-700 text-white text-sm font-bold rounded-xl transition-all shadow-md flex items-center justify-center gap-2">
+                            <i data-lucide="sparkles" class="w-4 h-4"></i> 執行 AI 數據分析
+                        </button>
+                    </div>
+                    
+                    <div id="adminAIResultArea" class="hidden mt-6 bg-[#f8fafc] p-6 rounded-xl border border-slate-200 relative overflow-hidden">
+                        <!-- 報告動作工具列 -->
+                        <div id="adminAIActionToolbar" class="hidden flex justify-end gap-3 mb-4 relative z-20 border-b border-slate-200 pb-4">
+                             <button onclick="exportAdminAIWord()" class="px-4 py-2 bg-white border border-slate-300 hover:bg-slate-50 text-slate-700 text-xs font-bold rounded-xl transition-colors flex items-center gap-1.5 shadow-sm">
+                                 <i data-lucide="file-text" class="w-4 h-4"></i> 匯出 Word 報告
+                             </button>
+                             <button onclick="saveAdminAIReport()" class="px-4 py-2 bg-amber-500 hover:bg-amber-400 text-slate-900 text-xs font-bold rounded-xl transition-colors flex items-center gap-1.5 shadow-sm">
+                                 <i data-lucide="save" class="w-4 h-4"></i> 儲存至雲端
+                             </button>
+                        </div>
+                        
+                        <div class="absolute -right-10 -bottom-10 opacity-[0.03] pointer-events-none">
+                            <i data-lucide="brain-circuit" class="w-48 h-48"></i>
+                        </div>
+                        
+                        <div id="adminAILoading" class="hidden flex flex-col items-center justify-center py-6 gap-3 text-amber-600 font-bold text-sm">
+                            <i data-lucide="loader-2" class="w-8 h-8 animate-spin"></i> 
+                            <span>AI 顧問正在為您深度分析營運數據，請稍候...</span>
+                        </div>
+                        <div id="adminAIContent" class="text-sm text-slate-700 leading-relaxed space-y-3 relative z-10">
+                            <!-- AI Content Injection -->
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- 歷史 AI 營運報告區塊 -->
+            <div class="bg-white rounded-2xl shadow-sm border border-slate-200 overflow-hidden">
+                <div class="p-6 border-b border-slate-100 flex items-center justify-between bg-slate-50">
+                    <h2 class="text-lg font-bold text-slate-800 flex items-center gap-2">
+                        <i data-lucide="archive" class="w-5 h-5 text-indigo-500"></i> 歷史營運分析報告
+                    </h2>
+                </div>
+                <div class="p-6">
+                    <div id="adminAIHistoryList" class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
+                        <div class="text-center py-4 text-xs text-slate-400 col-span-full">載入中...</div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- 會員名單管理 -->
+            <div class="bg-white rounded-2xl shadow-sm border border-slate-200 overflow-hidden">
+                <div class="p-6 border-b border-slate-100 flex items-center justify-between bg-slate-50">
+                    <h2 class="text-lg font-bold text-slate-800 flex items-center gap-2">
+                        <i data-lucide="users" class="w-5 h-5 text-indigo-500"></i> 會員名單管理
+                    </h2>
+                    <span class="text-xs font-bold bg-indigo-100 text-indigo-700 px-3 py-1 rounded-full">RBAC 權限系統</span>
+                </div>
+                <div class="overflow-x-auto">
+                    <table class="w-full text-left border-collapse whitespace-nowrap">
+                        <thead>
+                            <tr class="bg-slate-100 text-slate-500 text-xs uppercase tracking-wider">
+                                <th class="p-4 font-bold border-b border-slate-200">真實姓名</th>
+                                <th class="p-4 font-bold border-b border-slate-200">身分</th>
+                                <th class="p-4 font-bold border-b border-slate-200">會員信箱 Email</th>
+                                <th class="p-4 font-bold border-b border-slate-200">註冊時間</th>
+                                <th class="p-4 font-bold border-b border-slate-200 text-center">登入次數</th>
+                                <th class="p-4 font-bold border-b border-slate-200">目前權限</th>
+                                <th class="p-4 font-bold border-b border-slate-200 text-right">管理操作</th>
+                            </tr>
+                        </thead>
+                        <tbody id="adminUserTable" class="text-sm divide-y divide-slate-100">
+                            <tr><td colspan="7" class="p-8 text-center text-slate-400">載入中...</td></tr>
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+        </main>
+    </div>
+
+    <!-- Error Modal -->
+    <div id="errorModal" class="fixed inset-0 z-[100] hidden flex items-center justify-center p-4 bg-slate-900/60 backdrop-blur-sm">
+        <div class="bg-white rounded-2xl max-w-md w-full p-6 shadow-2xl scale-in-center">
+            <div class="flex items-center gap-3 text-red-600 mb-4">
+                <i data-lucide="alert-triangle" class="w-6 h-6"></i>
+                <h3 class="text-lg font-bold">系統通知</h3>
+            </div>
+            <p id="errorMessage" class="text-slate-600 text-sm mb-6 leading-relaxed"></p>
+            <button onclick="closeError()" class="w-full py-2.5 bg-slate-800 text-white font-bold rounded-xl hover:bg-slate-700 transition-all">確認</button>
+        </div>
+    </div>
+
+    <!-- Confirm Modal -->
+    <div id="confirmModal" class="fixed inset-0 z-[100] hidden flex items-center justify-center p-4 bg-slate-900/60 backdrop-blur-sm">
+        <div class="bg-white rounded-2xl max-w-md w-full p-6 shadow-2xl scale-in-center">
+            <div class="flex items-center gap-3 text-amber-600 mb-4">
+                <i data-lucide="help-circle" class="w-6 h-6"></i>
+                <h3 class="text-lg font-bold">系統確認</h3>
+            </div>
+            <p id="confirmMessage" class="text-slate-600 text-sm mb-6 leading-relaxed"></p>
+            <div class="flex gap-3">
+                <button id="confirmCancelBtn" class="flex-1 py-2.5 bg-slate-100 text-slate-600 font-bold rounded-xl hover:bg-slate-200 transition-all">取消</button>
+                <button id="confirmOkBtn" class="flex-1 py-2.5 bg-amber-500 text-white font-bold rounded-xl hover:bg-amber-600 transition-all shadow-md">確定</button>
+            </div>
+        </div>
+    </div>
+
+    <!-- ========================================== -->
+    <!-- 核心 JS 模組 (Firebase + 原有邏輯) -->
+    <!-- ========================================== -->
+    <script type="module">
+        import { initializeApp } from "https://www.gstatic.com/firebasejs/11.6.1/firebase-app.js";
+        import { getAuth, createUserWithEmailAndPassword, signInWithEmailAndPassword, signOut, onAuthStateChanged, sendEmailVerification, sendPasswordResetEmail } from "https://www.gstatic.com/firebasejs/11.6.1/firebase-auth.js";
+        import { getFirestore, doc, setDoc, getDoc, getDocs, collection, updateDoc, deleteDoc } from "https://www.gstatic.com/firebasejs/11.6.1/firebase-firestore.js";
+
+        // 保持您原本的 Firebase 設置
+        const firebaseConfig = {
+            apiKey: "AIzaSyCbuZ4K3N0-2TgYxGo6OhB52U8cVlgNiUA",
+            authDomain: "b13-ai-short-video-script.firebaseapp.com",
+            projectId: "b13-ai-short-video-script",
+            storageBucket: "b13-ai-short-video-script.firebasestorage.app",
+            messagingSenderId: "690456130989",
+            appId: "1:690456130989:web:933f34138f0dee1b2b9d24",
+            measurementId: "G-R7XLECH2QL"
+        };
+
+        const app = initializeApp(firebaseConfig);
+        const auth = getAuth(app);
+        const db = getFirestore(app);
+
+        let currentUserRole = 'user';
+        let authMode = 'login'; 
+
+        // 配置 PDF.js worker
+        if (typeof pdfjsLib !== 'undefined') {
+            pdfjsLib.GlobalWorkerOptions.workerSrc = 'https://cdnjs.cloudflare.com/ajax/libs/pdf.js/3.4.120/pdf.worker.min.js';
+        }
+
+        // ==========================================
+        // UI & Modal 邏輯
+        // ==========================================
+        window.showError = function(msg) {
+            document.getElementById('errorMessage').innerHTML = msg;
+            document.getElementById('errorModal').classList.remove('hidden');
+        }
+
+        window.closeError = function() {
+            document.getElementById('errorModal').classList.add('hidden');
+        }
+
+        window.showConfirm = function(msg, onConfirmCallback) {
+            document.getElementById('confirmMessage').textContent = msg;
+            document.getElementById('confirmModal').classList.remove('hidden');
+            
+            document.getElementById('confirmOkBtn').onclick = () => {
+                document.getElementById('confirmModal').classList.add('hidden');
+                if (onConfirmCallback) onConfirmCallback();
+            };
+            
+            document.getElementById('confirmCancelBtn').onclick = () => {
+                document.getElementById('confirmModal').classList.add('hidden');
+            };
+        };
+
+        window.togglePasswordVisibility = function() {
+            const pwdInput = document.getElementById('authPassword');
+            const eyeIcon = document.getElementById('pwdEyeIcon');
+            if(pwdInput.type === 'password') {
+                pwdInput.type = 'text';
+                eyeIcon.setAttribute('data-lucide', 'eye-off');
+            } else {
+                pwdInput.type = 'password';
+                eyeIcon.setAttribute('data-lucide', 'eye');
+            }
+            lucide.createIcons();
+        };
+
+        // ==========================================
+        // 權限與視圖切換邏輯
+        // ==========================================
+        window.switchView = function(view) {
+            document.getElementById('authWorkspace').classList.add('hidden');
+            document.getElementById('appWorkspace').classList.add('hidden');
+            document.getElementById('appWorkspace').style.display = ''; 
+            document.getElementById('adminWorkspace').classList.add('hidden');
+
+            if(view === 'auth') {
+                document.getElementById('authWorkspace').classList.remove('hidden');
+            } else if(view === 'app') {
+                document.getElementById('appWorkspace').classList.remove('hidden');
+                document.getElementById('appWorkspace').style.display = 'flex'; 
+                lucide.createIcons();
+            } else if(view === 'admin') {
+                if(currentUserRole !== 'admin') {
+                    window.showError("權限不足，無法進入管理後台。");
+                    return window.switchView('app');
+                }
+                document.getElementById('adminWorkspace').classList.remove('hidden');
+                fetchAdminData();
+                window.loadAdminAIReports(); 
+                lucide.createIcons();
+            }
+        };
+
+        // ==========================================
+        // Firebase Auth 登入/註冊/忘記密碼 邏輯
+        // ==========================================
+        window.toggleAuthMode = function(mode) {
+            authMode = mode;
+            const btn = document.getElementById('authSubmitBtn');
+            const pwdField = document.getElementById('passwordField');
+            const toggleBtn = document.getElementById('toggleAuthBtn');
+            const forgotBtn = document.getElementById('forgotPwdBtn');
+            const alertBox = document.getElementById('authAlert');
+            
+            const registerFields = document.getElementById('registerFields');
+            const authNameInput = document.getElementById('authName');
+            const spamReminder = document.getElementById('spamReminder');
+            
+            alertBox.classList.add('hidden');
+            document.getElementById('authPassword').required = (mode !== 'reset');
+
+            if(mode === 'login') {
+                pwdField.classList.remove('hidden');
+                registerFields.classList.add('hidden');
+                spamReminder.classList.add('hidden');
+                authNameInput.required = false;
+
+                btn.innerHTML = '<i data-lucide="log-in" class="w-4 h-4"></i> <span>登入系統</span>';
+                toggleBtn.innerHTML = '還沒有帳號？<span class="text-amber-400 font-bold border-b border-amber-400/30">立即註冊</span>';
+                toggleBtn.onclick = () => window.toggleAuthMode('register');
+                forgotBtn.classList.remove('hidden');
+            } else if(mode === 'register') {
+                pwdField.classList.remove('hidden');
+                registerFields.classList.remove('hidden');
+                spamReminder.classList.remove('hidden'); 
+                authNameInput.required = true;
+
+                btn.innerHTML = '<i data-lucide="user-plus" class="w-4 h-4"></i> <span>建立新帳號</span>';
+                toggleBtn.innerHTML = '已有帳號？<span class="text-amber-400 font-bold border-b border-amber-400/30">返回登入</span>';
+                toggleBtn.onclick = () => window.toggleAuthMode('login');
+                forgotBtn.classList.add('hidden');
+            } else if(mode === 'reset') {
+                pwdField.classList.add('hidden');
+                registerFields.classList.add('hidden');
+                spamReminder.classList.remove('hidden'); 
+                authNameInput.required = false;
+
+                btn.innerHTML = '<i data-lucide="mail-check" class="w-4 h-4"></i> <span>發送重設密碼信</span>';
+                toggleBtn.innerHTML = '想起來了？<span class="text-amber-400 font-bold border-b border-amber-400/30">返回登入</span>';
+                toggleBtn.onclick = () => window.toggleAuthMode('login');
+                forgotBtn.classList.add('hidden');
+            }
+            lucide.createIcons();
+        };
+
+        function showAuthMessage(msg, isError = false) {
+            const alertBox = document.getElementById('authAlert');
+            alertBox.innerHTML = msg;
+            alertBox.classList.remove('hidden', 'bg-red-100', 'text-red-700', 'border-red-200', 'bg-green-100', 'text-green-700', 'border-green-200');
+            if (isError) {
+                alertBox.classList.add('bg-red-100', 'text-red-700', 'border-red-200');
+            } else {
+                alertBox.classList.add('bg-green-100', 'text-green-700', 'border-green-200');
+            }
+        }
+
+        window.handleAuth = async function(e) {
+            e.preventDefault();
+            const email = document.getElementById('authEmail').value.trim();
+            const password = document.getElementById('authPassword').value;
+            const btn = document.getElementById('authSubmitBtn');
+            
+            btn.disabled = true;
+            btn.style.opacity = '0.7';
+
+            try {
+                if (authMode === 'register') {
+                    const realName = document.getElementById('authName').value.trim();
+                    const identity = document.getElementById('authIdentity').value;
+
+                    const userCredential = await createUserWithEmailAndPassword(auth, email, password);
+                    await sendEmailVerification(userCredential.user);
+                    
+                    const role = (email === 'mindnodeai@gmail.com') ? 'admin' : 'user';
+                    
+                    try {
+                        // 修正：使用原本的路徑 `users/${uid}`
+                        await setDoc(doc(db, 'users', userCredential.user.uid), {
+                            email: email,
+                            role: role,
+                            realName: realName || '未提供',
+                            identity: identity || '未提供',
+                            loginCount: 0,
+                            createdAt: new Date().toISOString()
+                        });
+                    } catch (dbError) {
+                        console.error("Firestore SetDoc Error:", dbError);
+                        if (dbError.code === 'permission-denied' || dbError.message.includes('permission')) {
+                            await signOut(auth);
+                            window.toggleAuthMode('login');
+                            showAuthMessage("⚠️ 帳號已建立，但資料庫(Firestore)權限不足！請至 Firebase Console 將 Rules 設為 <code>allow read, write: if true;</code>", true);
+                            return;
+                        }
+                    }
+
+                    await signOut(auth); 
+                    window.toggleAuthMode('login');
+                    showAuthMessage("✅ 註冊成功！請至信箱點擊驗證連結後再登入。", false);
+                } 
+                else if (authMode === 'login') {
+                    const userCredential = await signInWithEmailAndPassword(auth, email, password);
+                    const user = userCredential.user;
+                    
+                    if (!user.emailVerified && user.email !== 'mindnodeai@gmail.com') {
+                        await signOut(auth);
+                        showAuthMessage("❌ 登入失敗：請先至信箱點擊驗證連結。", true);
+                        return;
+                    }
+
+                    try {
+                        const userRef = doc(db, 'users', user.uid);
+                        const userSnap = await getDoc(userRef);
+                        if (userSnap.exists()) {
+                            const currentCount = userSnap.data().loginCount || 0;
+                            await updateDoc(userRef, { loginCount: currentCount + 1 });
+                        }
+                    } catch(e) {
+                        console.error("更新登入次數失敗:", e);
+                    }
+                }
+                else if (authMode === 'reset') {
+                    await sendPasswordResetEmail(auth, email);
+                    window.toggleAuthMode('login');
+                    showAuthMessage("✅ 密碼重設信已寄出，請查收信箱。", false);
+                }
+            } catch (error) {
+                console.error(error);
+                let msg = "發生錯誤，請稍後再試。";
+                if(error.code === 'auth/email-already-in-use') msg = "❌ 此信箱已註冊過。";
+                if(error.code === 'auth/invalid-credential') msg = "❌ 帳號或密碼錯誤。";
+                if(error.code === 'auth/weak-password') msg = "❌ 密碼太弱，請至少輸入6個字元。";
+                if(error.code === 'auth/operation-not-allowed') msg = "❌ 登入被拒絕。請至 Firebase Console -> Authentication -> Sign-in method 中啟用 Email/Password 登入。";
+                showAuthMessage(msg, true);
+            } finally {
+                btn.disabled = false;
+                btn.style.opacity = '1';
+            }
+        };
+
+        window.handleLogout = async function() {
+            await signOut(auth);
+        };
+
+        onAuthStateChanged(auth, async (user) => {
+            if (user) {
+                if (!user.emailVerified && user.email !== 'mindnodeai@gmail.com') {
+                    await signOut(auth);
+                    return;
+                }
+
+                try {
+                    const userRef = doc(db, 'users', user.uid);
+                    const userSnap = await getDoc(userRef);
+                    
+                    if (userSnap.exists()) {
+                        currentUserRole = userSnap.data().role;
+                        
+                        if (user.email === 'mindnodeai@gmail.com' && currentUserRole !== 'admin') {
+                            currentUserRole = 'admin';
+                            await updateDoc(userRef, { role: 'admin' });
+                        }
+                    } else {
+                        currentUserRole = (user.email === 'mindnodeai@gmail.com') ? 'admin' : 'user';
+                        await setDoc(userRef, {
+                            email: user.email,
+                            role: currentUserRole,
+                            realName: '舊會員自動補齊',
+                            identity: '未提供',
+                            loginCount: 1,
+                            createdAt: new Date().toISOString()
+                        });
+                    }
+
+                    if (currentUserRole === 'disabled' && user.email !== 'mindnodeai@gmail.com') {
+                        await signOut(auth);
+                        showAuthMessage("❌ 您的帳號已被管理員停用。", true);
+                        return;
+                    }
+
+                    document.getElementById('navUserEmail').textContent = user.email;
+                    document.getElementById('navUserRole').textContent = `ROLE: ${currentUserRole}`;
+                    
+                    const adminBtn = document.getElementById('navAdminBtn');
+                    if (currentUserRole === 'admin') {
+                        adminBtn.classList.remove('hidden');
+                    } else {
+                        adminBtn.classList.add('hidden');
+                    }
+
+                    window.switchView('app');
+                    window.syncHistoryFromCloud();
+                } catch (error) {
+                    console.error("Firestore Auth Error:", error);
+                    await signOut(auth);
+                    if (error.code === 'permission-denied' || error.message.includes('permission')) {
+                        showAuthMessage("❌ 系統錯誤：Firestore 權限不足！<br>請至 Firebase Console 的 Firestore Database -> Rules，將規則修改為 <code>allow read, write: if true;</code> 以便測試。", true);
+                    } else {
+                        showAuthMessage("❌ 讀取使用者資料時發生錯誤，請稍後再試。", true);
+                    }
+                }
+            } else {
+                currentUserRole = 'user';
+                window.switchView('auth');
+            }
+        });
+
+        // ==========================================
+        // 管理者後台 (Admin Dashboard) 邏輯
+        // ==========================================
+        let allUsersData = [];
+        let currentAdminAIReport = null; 
+        let allAdminReports = []; 
+
+        window.runAdminAIAnalysis = async function() {
+            const startStr = document.getElementById('adminStartDate').value;
+            const endStr = document.getElementById('adminEndDate').value;
+            
+            if (!startStr || !endStr) return window.showError("請先選擇完整的起訖時間區間！");
+            
+            const startDate = new Date(startStr);
+            const endDate = new Date(endStr);
+            endDate.setHours(23, 59, 59, 999); 
+
+            if (startDate > endDate) return window.showError("起始日期不能大於結束日期！");
+
+            const filteredData = allUsersData.filter(user => {
+                if(!user.createdAt) return false;
+                const userDate = new Date(user.createdAt);
+                return userDate >= startDate && userDate <= endDate;
+            });
+
+            if (filteredData.length === 0) return window.showError("該時間區間內沒有新的註冊會員數據可供分析。");
+
+            const totalUsers = filteredData.length;
+            const totalLogins = filteredData.reduce((sum, u) => sum + (u.loginCount || 0), 0);
+            const identityCounts = {};
+            filteredData.forEach(u => {
+                const id = u.identity || '未提供';
+                identityCounts[id] = (identityCounts[id] || 0) + 1;
+            });
+            const identityStr = Object.entries(identityCounts).map(([k,v]) => `${k}:${v}人`).join('，');
+
+            const apiKey = document.getElementById('apiKey').value.trim();
+            if (!apiKey) return window.showError("💡 請先在主畫面設定您的 Google Gemini API Key，才能執行 AI 數據分析喔！");
+
+            const btn = document.getElementById('btnAdminAI');
+            const resultArea = document.getElementById('adminAIResultArea');
+            const loading = document.getElementById('adminAILoading');
+            const content = document.getElementById('adminAIContent');
+            const toolbar = document.getElementById('adminAIActionToolbar');
+
+            btn.disabled = true;
+            resultArea.classList.remove('hidden');
+            loading.classList.remove('hidden');
+            content.classList.add('hidden');
+            toolbar.classList.add('hidden'); 
+
+            const prompt = `您是一位名為 TONY 老師的頂尖數位行銷科技顧問與 SaaS 平台經營者。
+            請根據以下 SaaS 平台在 ${startStr} 到 ${endStr} 期間的營運數據，提供一份精簡、專業、具備行銷洞察的分析報告。
+            
+            【營運數據】
+            - 期間新增註冊總人數: ${totalUsers} 人
+            - 期間會員總登入次數: ${totalLogins} 次
+            - 期間註冊會員身分組成: ${identityStr}
+            
+            【要求】
+            1. 評估平台近期的成長性或會員黏著度。
+            2. 針對「TONY老師學員」與「非學員(一般訪客)」的組成結構，給予一兩個具體、可落地的行銷轉換建議。
+            3. 語氣專業、自信且充滿熱忱，請直接輸出美觀的 HTML 格式 (可使用 <h3>, <p>, <ul>, <li>, <strong class="text-amber-600"> 等標籤，不需 markdown 語法包裝)。`;
+
+            try {
+                // 使用 Gemini 3.5 Flash 進行分析
+                const resText = await window.callGeminiTextWithRetry(apiKey, { contents: [{ parts: [{ text: prompt }] }] });
+                content.innerHTML = resText;
+                
+                currentAdminAIReport = {
+                    dateRange: `${startStr} ~ ${endStr}`,
+                    content: resText,
+                    timestamp: new Date().toISOString()
+                };
+
+                loading.classList.add('hidden');
+                content.classList.remove('hidden');
+                toolbar.classList.remove('hidden'); 
+            } catch (err) {
+                window.showError("AI 分析發生錯誤：" + err.message);
+                resultArea.classList.add('hidden');
+            } finally {
+                btn.disabled = false;
+            }
+        };
+
+        window.exportAdminAIWord = function() {
+            if (!currentAdminAIReport) return window.showError("沒有可匯出的報告！");
+            
+            const header = "<html xmlns:o='urn:schemas-microsoft-com:office:office' xmlns:w='urn:schemas-microsoft-com:office:word' xmlns='http://www.w3.org/TR/REC-html40'><head><meta charset='utf-8'><title>AI營運數據分析報告</title><style>body { font-family: 'Microsoft JhengHei', 'PingFang TC', sans-serif; line-height: 1.6; color: #333; } h2, h3, h4 { color: #1e293b; margin-top: 1.5em; } p, li { margin-bottom: 0.8em; } .text-amber-600 { color: #d97706; font-weight: bold; }</style></head><body>";
+            const footer = "</body></html>";
+            const html = `<h2>💡 TONY STUDIO 營運數據分析報告</h2><p><strong>數據區間：</strong> ${currentAdminAIReport.dateRange}</p><p><strong>分析時間：</strong> ${new Date(currentAdminAIReport.timestamp).toLocaleString('zh-TW')}</p><hr/><br/>${currentAdminAIReport.content}`;
+            
+            const blob = new Blob(['\ufeff', header + html + footer], { type: 'application/msword' });
+            const link = document.createElement('a');
+            link.href = URL.createObjectURL(blob);
+            link.download = `SaaS_營運分析報告_${currentAdminAIReport.dateRange.replace(/\//g, '-')}.doc`;
+            document.body.appendChild(link);
+            link.click();
+            document.body.removeChild(link);
+        };
+
+        window.saveAdminAIReport = async function() {
+            if (!currentAdminAIReport) return window.showError("沒有可儲存的報告！");
+            const user = auth.currentUser;
+            if (!user) return window.showError("尚未登入");
+
+            try {
+                const reportId = crypto.randomUUID();
+                // 存入原本路徑 users/{uid}/admin_reports
+                await setDoc(doc(db, 'users', user.uid, 'admin_reports', reportId), {
+                    id: reportId,
+                    dateRange: currentAdminAIReport.dateRange,
+                    content: currentAdminAIReport.content,
+                    timestamp: currentAdminAIReport.timestamp
+                });
+                window.showConfirm("✅ 報告已成功儲存至雲端！", () => {
+                    window.loadAdminAIReports();
+                });
+            } catch(e) {
+                window.showError("儲存失敗：" + e.message);
+            }
+        };
+
+        window.loadAdminAIReports = async function() {
+            const user = auth.currentUser;
+            if (!user) return;
+            const listEl = document.getElementById('adminAIHistoryList');
+            if (!listEl) return;
+            
+            listEl.innerHTML = '<div class="text-center py-4 text-xs text-slate-400 col-span-full">載入中...</div>';
+
+            try {
+                const reportsRef = collection(db, 'users', user.uid, 'admin_reports');
+                const snapshot = await getDocs(reportsRef);
+                allAdminReports = [];
+                snapshot.forEach(doc => allAdminReports.push(doc.data()));
+
+                allAdminReports.sort((a, b) => new Date(b.timestamp) - new Date(a.timestamp));
+
+                if (allAdminReports.length === 0) {
+                    listEl.innerHTML = '<div class="text-center py-8 text-sm text-slate-400 col-span-full">尚無儲存的歷史報告。執行分析後點擊「儲存至雲端」即可保留紀錄。</div>';
+                    return;
+                }
+
+                listEl.innerHTML = allAdminReports.map(r => `
+                    <div class="flex items-center justify-between p-4 bg-white border border-slate-200 rounded-xl hover:border-amber-400 transition-all shadow-sm group">
+                        <div class="flex-1 min-w-0 cursor-pointer" onclick="viewAdminAIReport('${r.id}')">
+                            <h4 class="text-sm font-bold text-slate-700 truncate">營運分析 (${r.dateRange})</h4>
+                            <p class="text-xs text-slate-400 mt-1 flex items-center gap-1">
+                                <i data-lucide="clock" class="w-3.5 h-3.5"></i> ${new Date(r.timestamp).toLocaleString('zh-TW')}
+                            </p>
+                        </div>
+                        <button onclick="deleteAdminAIReport('${r.id}')" class="p-2 text-slate-300 hover:text-rose-500 hover:bg-rose-50 rounded-lg transition-colors" title="刪除報告">
+                            <i data-lucide="trash-2" class="w-5 h-5"></i>
+                        </button>
+                    </div>
+                `).join('');
+                lucide.createIcons();
+            } catch(e) {
+                listEl.innerHTML = '<div class="text-center py-4 text-xs text-red-400 col-span-full">歷史報告載入失敗，請檢查網路狀態。</div>';
+            }
+        };
+
+        window.viewAdminAIReport = function(id) {
+            const report = allAdminReports.find(r => r.id === id);
+            if (!report) return;
+            
+            currentAdminAIReport = report;
+            document.getElementById('adminAIResultArea').classList.remove('hidden');
+            document.getElementById('adminAILoading').classList.add('hidden');
+            document.getElementById('adminAIContent').classList.remove('hidden');
+            document.getElementById('adminAIActionToolbar').classList.remove('hidden');
+            document.getElementById('adminAIContent').innerHTML = report.content;
+            
+            document.getElementById('adminAIResultArea').scrollIntoView({ behavior: 'smooth', block: 'center' });
+        };
+
+        window.deleteAdminAIReport = async function(id) {
+            window.showConfirm("確定要永久刪除這份歷史營運報告嗎？", async () => {
+                const user = auth.currentUser;
+                if(!user) return;
+                try {
+                    await deleteDoc(doc(db, 'users', user.uid, 'admin_reports', id));
+                    
+                    if(currentAdminAIReport && currentAdminAIReport.id === id) {
+                        currentAdminAIReport = null;
+                        document.getElementById('adminAIResultArea').classList.add('hidden');
+                    }
+                    
+                    window.loadAdminAIReports();
+                } catch(e) {
+                    window.showError("刪除失敗：" + e.message);
+                }
+            });
+        };
+
+        window.callGeminiTextWithRetry = async function(apiKey, payload, retries = 2) {
+            for (let i = 0; i < retries; i++) {
+                try {
+                    const res = await fetch(`https://generativelanguage.googleapis.com/v1beta/models/gemini-3.5-flash:generateContent?key=${apiKey}`, {
+                        method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify(payload)
+                    });
+                    const data = await res.json();
+                    if (!res.ok) throw new Error(data.error?.message || "伺服器繁忙");
+                    let textResponse = data.candidates[0].content.parts[0].text;
+                    return textResponse.replace(/```html/gi, '').replace(/```/g, '').trim();
+                } catch (err) {
+                    if (i === retries - 1) throw err;
+                    await new Promise(r => setTimeout(r, 1500));
+                }
+            }
+        };
+
+        async function fetchAdminData() {
+            const tableBody = document.getElementById('adminUserTable');
+            tableBody.innerHTML = '<tr><td colspan="7" class="p-8 text-center text-slate-400">正在同步資料庫...</td></tr>';
+            try {
+                const querySnapshot = await getDocs(collection(db, "users"));
+                allUsersData = [];
+                let html = '';
+                querySnapshot.forEach((docSnap) => {
+                    const data = docSnap.data();
+                    allUsersData.push({ id: docSnap.id, ...data });
+                    
+                    const isSuperAdmin = data.email === 'mindnodeai@gmail.com';
+                    const roleBadgeColor = data.role === 'admin' ? 'bg-amber-100 text-amber-700 border-amber-200' : 
+                                         (data.role === 'disabled' ? 'bg-red-100 text-red-700 border-red-200' : 'bg-slate-100 text-slate-700 border-slate-200');
+                    const dateStr = data.createdAt ? new Date(data.createdAt).toLocaleDateString('zh-TW') : '無資料';
+
+                    html += `
+                    <tr class="hover:bg-slate-50 transition-colors">
+                        <td class="p-4 border-b border-slate-100 font-bold text-slate-700">${data.realName || '未提供'}</td>
+                        <td class="p-4 border-b border-slate-100 text-slate-500">
+                            <span class="bg-indigo-50 text-indigo-700 px-2 py-1 rounded text-xs border border-indigo-100">${data.identity || '未提供'}</span>
+                        </td>
+                        <td class="p-4 border-b border-slate-100 font-medium text-slate-800 flex items-center gap-2">
+                            ${isSuperAdmin ? '<i data-lucide="crown" class="w-4 h-4 text-amber-500"></i>' : '<i data-lucide="mail" class="w-4 h-4 text-slate-400"></i>'}
+                            ${data.email}
+                        </td>
+                        <td class="p-4 border-b border-slate-100 text-slate-500">${dateStr}</td>
+                        <td class="p-4 border-b border-slate-100 text-slate-600 text-center font-mono font-bold">${data.loginCount || 0}</td>
+                        <td class="p-4 border-b border-slate-100">
+                            <span class="px-2.5 py-1 text-xs font-bold rounded-lg border ${roleBadgeColor} uppercase tracking-wider">${data.role}</span>
+                        </td>
+                        <td class="p-4 border-b border-slate-100 text-right space-x-2">
+                            ${!isSuperAdmin ? `
+                                <button onclick="changeRole('${docSnap.id}', '${data.role === 'admin' ? 'user' : 'admin'}')" class="text-xs px-3 py-1.5 rounded-lg border ${data.role==='admin'?'border-slate-300 text-slate-600 hover:bg-slate-100':'border-indigo-200 text-indigo-600 hover:bg-indigo-50'} transition-all">
+                                    ${data.role === 'admin' ? '降為 User' : '升為 Admin'}
+                                </button>
+                                <button onclick="deleteUser('${docSnap.id}')" class="text-xs px-3 py-1.5 rounded-lg border border-red-200 text-red-600 hover:bg-red-50 transition-all">
+                                    停用刪除
+                                </button>
+                            ` : '<span class="text-xs text-slate-400 italic pr-2">系統創作者保護</span>'}
+                        </td>
+                    </tr>`;
+                });
+                tableBody.innerHTML = html;
+                lucide.createIcons();
+            } catch (error) {
+                console.error("Admin fetch error:", error);
+                if (error.code === 'permission-denied' || error.message.includes('permission')) {
+                    tableBody.innerHTML = `
+                    <tr>
+                        <td colspan="7" class="p-8 text-center text-red-500 font-bold">
+                            ❌ 讀取失敗：Firestore 權限不足！<br>
+                            <span class="text-sm font-normal text-slate-500 mt-2 block">請至 Firebase Console > Firestore Database > Rules，將規則改為 <code>allow read, write: if true;</code></span>
+                        </td>
+                    </tr>`;
+                } else {
+                    tableBody.innerHTML = '<tr><td colspan="7" class="p-8 text-center text-red-500">讀取失敗，請檢查網路狀態或權限設定。</td></tr>';
+                }
+            }
+        }
+
+        window.changeRole = async function(userId, newRole) {
+            window.showConfirm(`確定要變更該會員權限為 ${newRole} 嗎？`, async () => {
+                try {
+                    await updateDoc(doc(db, 'users', userId), { role: newRole });
+                    fetchAdminData();
+                } catch(error) {
+                    console.error(error);
+                    if (error.code === 'permission-denied' || error.message.includes('permission')) {
+                        window.showError("變更失敗：Firestore 權限不足，請檢查 Firebase Console 的 Rules 設定。");
+                    } else {
+                        window.showError("更新權限失敗：" + error.message);
+                    }
+                }
+            });
+        };
+
+        window.deleteUser = async function(userId) {
+            window.showConfirm('注意：此操作將其設為「disabled (停用)」，該用戶將無法再登入系統。確定執行？', async () => {
+                try {
+                    await updateDoc(doc(db, 'users', userId), { role: 'disabled' });
+                    fetchAdminData();
+                } catch(error) {
+                    console.error(error);
+                    if (error.code === 'permission-denied' || error.message.includes('permission')) {
+                        window.showError("停用失敗：Firestore 權限不足，請檢查 Firebase Console 的 Rules 設定。");
+                    } else {
+                        window.showError("停用失敗：" + error.message);
+                    }
+                }
+            });
+        };
+
+        window.exportCSV = function() {
+            if(allUsersData.length === 0) return window.showError("無資料可匯出，請稍後再試。");
+            
+            let csvContent = "\uFEFF真實姓名,身分,會員信箱,註冊時間,登入次數,權限身分\n";
+            allUsersData.forEach(row => {
+                const dateStr = row.createdAt ? new Date(row.createdAt).toLocaleDateString('zh-TW') : '';
+                const safeName = (row.realName || '未提供').replace(/,/g, '，'); 
+                const safeIdentity = (row.identity || '未提供').replace(/,/g, '，');
+                csvContent += `${safeName},${safeIdentity},${row.email},${dateStr},${row.loginCount || 0},${row.role}\n`;
+            });
+
+            const blob = new Blob([csvContent], { type: 'text/csv;charset=utf-8;' });
+            const link = document.createElement("a");
+            link.href = URL.createObjectURL(blob);
+            link.download = `SaaS_會員名單_${new Date().toISOString().slice(0,10)}.csv`;
+            link.click();
+        };
+
+        // ==========================================
+        // 腳本創作核心邏輯 (掛載至 window)
+        // ==========================================
+        lucide.createIcons();
+        const dropZone = document.getElementById('dropZone');
+        const fileInput = document.getElementById('fileInput');
+        const fileListDisplay = document.getElementById('fileList');
+        let selectedPlatform = 'KLINGAI';
+        let uploadedFiles = [];
+        let uploadedLinks = []; 
+
+        window.toggleCustomStyle = function() {
+            const select = document.getElementById('scriptStyle');
+            const customInput = document.getElementById('customScriptStyle');
+            if (select.value === '其他') {
+                customInput.classList.remove('hidden');
+                customInput.focus();
+            } else {
+                customInput.classList.add('hidden');
+            }
+        };
+
+        const apiKeyInput = document.getElementById('apiKey');
+        const apiStatusLight = document.getElementById('apiStatusLight');
+        const apiContainer = document.getElementById('apiContainer');
+        if(apiKeyInput) {
+            apiKeyInput.addEventListener('input', (e) => {
+                const val = e.target.value.trim();
+                if (val.length > 30) {
+                    apiStatusLight.classList.remove('bg-red-500', 'animate-pulse', 'shadow-[0_0_8px_rgba(239,68,68,0.6)]');
+                    apiStatusLight.classList.add('bg-green-500', 'shadow-[0_0_8px_rgba(34,197,94,0.6)]');
+                    apiStatusLight.title = "API Key 格式可能正確";
+                    apiContainer.classList.add('border-green-500/50');
+                } else {
+                    apiStatusLight.classList.remove('bg-green-500', 'shadow-[0_0_8px_rgba(34,197,94,0.6)]');
+                    apiStatusLight.classList.add('bg-red-500', 'animate-pulse', 'shadow-[0_0_8px_rgba(239,68,68,0.6)]');
+                    apiStatusLight.title = "未輸入或無效的 API Key";
+                    apiContainer.classList.remove('border-green-500/50');
+                }
+            });
+        }
+
+        const HISTORY_KEY = 'tony_studio_scripts';
+
+        // 雲端與離線備份功能
+        window.updateCloudStatus = function(isSyncing, errorMsg = null) {
+            const statusEl = document.getElementById('cloudSyncStatus');
+            if(!statusEl) return;
+            statusEl.classList.remove('hidden');
+            if(isSyncing) {
+                statusEl.innerHTML = `<i data-lucide="cloud-lightning" class="w-3 h-3 text-blue-500 animate-pulse"></i><span class="text-blue-500">雲端同步中...</span>`;
+            } else if(errorMsg) {
+                statusEl.innerHTML = `<i data-lucide="cloud-off" class="w-3 h-3 text-red-500"></i><span class="text-red-500">同步失敗: ${errorMsg}</span>`;
+            } else {
+                statusEl.innerHTML = `<i data-lucide="cloud-check" class="w-3 h-3 text-green-500"></i><span class="text-green-500">已與雲端同步</span>`;
+            }
+            lucide.createIcons();
+        };
+
+        window.syncHistoryFromCloud = async function() {
+            const user = auth.currentUser;
+            if(!user) return;
+            window.updateCloudStatus(true);
+            try {
+                // 原本的路徑 users/{uid}/scripts
+                const scriptsRef = collection(db, 'users', user.uid, 'scripts');
+                const snapshot = await getDocs(scriptsRef);
+                let cloudHistory = [];
+                snapshot.forEach(doc => cloudHistory.push(doc.data()));
+                
+                let localHistory = JSON.parse(localStorage.getItem(HISTORY_KEY) || '[]');
+                const localIds = new Set(localHistory.map(item => item.id).filter(id => id));
+                
+                let updated = false;
+                cloudHistory.forEach(cItem => {
+                    if(!localIds.has(cItem.id)) {
+                        localHistory.push(cItem);
+                        updated = true;
+                    }
+                });
+                
+                localHistory.sort((a, b) => new Date(b.timestamp || 0) - new Date(a.timestamp || 0));
+                
+                if(updated) localStorage.setItem(HISTORY_KEY, JSON.stringify(localHistory));
+                window.loadHistory();
+                window.updateCloudStatus(false);
+            } catch(e) {
+                console.error("Cloud Sync Error", e);
+                window.updateCloudStatus(false, "網路或權限錯誤");
+            }
+        };
+
+        window.saveScriptToCloud = async function(item) {
+            const user = auth.currentUser;
+            if(!user || !item.id) return;
+            window.updateCloudStatus(true);
+            try {
+                await setDoc(doc(db, 'users', user.uid, 'scripts', item.id), item);
+                window.updateCloudStatus(false);
+            } catch(e) {
+                window.updateCloudStatus(false, "儲存失敗");
+            }
+        };
+
+        window.deleteScriptFromCloud = async function(itemId) {
+            const user = auth.currentUser;
+            if(!user || !itemId) return;
+            window.updateCloudStatus(true);
+            try {
+                await deleteDoc(doc(db, 'users', user.uid, 'scripts', itemId));
+                window.updateCloudStatus(false);
+            } catch(e) {
+                window.updateCloudStatus(false, "刪除失敗");
+            }
+        };
+
+        window.exportOfflineBackup = function() {
+            const history = localStorage.getItem(HISTORY_KEY) || '[]';
+            const blob = new Blob([history], { type: 'application/json' });
+            const link = document.createElement("a");
+            link.href = URL.createObjectURL(blob);
+            link.download = `SaaS_腳本備份_${new Date().toISOString().slice(0,10)}.json`;
+            link.click();
+        };
+
+        window.importOfflineBackup = function(event) {
+            const file = event.target.files[0];
+            if(!file) return;
+            const reader = new FileReader();
+            reader.onload = async (e) => {
+                try {
+                    const imported = JSON.parse(e.target.result);
+                    if(!Array.isArray(imported)) throw new Error("無效的備份格式");
+                    
+                    let localHistory = JSON.parse(localStorage.getItem(HISTORY_KEY) || '[]');
+                    const localIds = new Set(localHistory.map(item => item.id).filter(id => id));
+                    
+                    let addedCount = 0;
+                    for (const item of imported) {
+                        if (!item.id) item.id = crypto.randomUUID();
+                        if (!localIds.has(item.id)) {
+                            localHistory.push(item);
+                            localIds.add(item.id);
+                            addedCount++;
+                            await window.saveScriptToCloud(item);
+                        }
+                    }
+                    
+                    localHistory.sort((a, b) => new Date(b.timestamp || 0) - new Date(a.timestamp || 0));
+                    localStorage.setItem(HISTORY_KEY, JSON.stringify(localHistory));
+                    window.loadHistory();
+                    window.showConfirm(`成功載入並雲端同步 ${addedCount} 筆腳本紀錄！`, null);
+                } catch(err) {
+                    window.showError("載入失敗：檔案格式不正確");
+                }
+            };
+            reader.readAsText(file);
+            event.target.value = '';
+        };
+
+        window.loadHistory = function() {
+            window.searchHistory(); 
+        };
+
+        window.searchHistory = function() {
+            const searchInput = document.getElementById('historySearchInput');
+            const keyword = searchInput ? searchInput.value.toLowerCase() : '';
+            const history = JSON.parse(localStorage.getItem(HISTORY_KEY) || '[]');
+            
+            const filtered = history.filter(item => 
+                (item.title || '').toLowerCase().includes(keyword) || 
+                (item.date || '').includes(keyword)
+            );
+
+            const historyListEl = document.getElementById('historyList');
+            if (filtered.length === 0) {
+                historyListEl.innerHTML = '<div class="text-center py-4 text-xs text-slate-400">尚無紀錄或找不到相符的腳本</div>';
+                return;
+            }
+            
+            historyListEl.innerHTML = filtered.map((item) => `
+                <div class="flex items-center justify-between p-3 bg-slate-50 border border-slate-200 rounded-xl hover:border-slate-300 transition-all group">
+                    <div class="flex-1 min-w-0 cursor-pointer" onclick="loadHistoryScript('${item.id}')">
+                        <h4 class="text-sm font-bold text-slate-700 truncate">${item.title}</h4>
+                        <p class="text-[10px] text-slate-400 mt-1 flex items-center gap-1">
+                            <i data-lucide="clock" class="w-3 h-3"></i> ${item.date}
+                        </p>
+                    </div>
+                    <button onclick="deleteHistoryScript('${item.id}')" class="p-1.5 text-slate-300 hover:text-red-500 hover:bg-red-50 rounded-lg transition-colors" title="刪除紀錄">
+                        <i data-lucide="trash-2" class="w-4 h-4"></i>
+                    </button>
+                </div>
+            `).join('');
+            lucide.createIcons();
+        };
+
+        window.saveToHistory = function(data) {
+            let history = JSON.parse(localStorage.getItem(HISTORY_KEY) || '[]');
+            const now = new Date();
+            const dateStr = `${now.getMonth()+1}/${now.getDate()} ${now.getHours().toString().padStart(2, '0')}:${now.getMinutes().toString().padStart(2, '0')}`;
+            const newItem = { 
+                id: crypto.randomUUID(),
+                title: data.title || "未命名腳本", 
+                date: dateStr, 
+                timestamp: now.toISOString(),
+                data: data 
+            };
+            history.unshift(newItem);
+            if (history.length > 20) history = history.slice(0, 20);
+            localStorage.setItem(HISTORY_KEY, JSON.stringify(history));
+            window.loadHistory();
+            window.saveScriptToCloud(newItem); 
+        };
+
+        window.loadHistoryScript = function(id) {
+            const history = JSON.parse(localStorage.getItem(HISTORY_KEY) || '[]');
+            const item = history.find(i => i.id === id);
+            if (item && item.data) {
+                document.getElementById('emptyState').classList.add('hidden');
+                document.getElementById('loadingState').classList.add('hidden');
+                window.displayScript(item.data);
+            }
+        };
+
+        window.deleteHistoryScript = function(id) {
+            window.showConfirm("確定要刪除這筆腳本紀錄嗎？", async () => {
+                let history = JSON.parse(localStorage.getItem(HISTORY_KEY) || '[]');
+                const index = history.findIndex(i => i.id === id);
+                if (index !== -1) {
+                    const item = history[index];
+                    if(item && item.id) await window.deleteScriptFromCloud(item.id);
+                    
+                    history.splice(index, 1);
+                    localStorage.setItem(HISTORY_KEY, JSON.stringify(history));
+                    window.loadHistory();
+                }
+            });
+        };
+
+        window.setPlatform = function(platform, btn) {
+            selectedPlatform = platform;
+            document.querySelectorAll('.platform-btn').forEach(b => {
+                b.className = 'platform-btn px-4 py-2 text-sm border border-slate-200 rounded-xl bg-white text-slate-600 hover:bg-slate-50 transition-colors';
+            });
+            btn.className = 'platform-btn px-4 py-2 text-sm border border-slate-800 rounded-xl bg-slate-800 text-white hover:bg-slate-700 transition-colors';
+            const descEl = document.getElementById('platformDescription');
+            if (descEl) {
+                if (platform === 'KLINGAI') descEl.innerHTML = '<span class="font-bold text-slate-700">【KLINGAI 專屬規則】</span><br>時間最為彈性，可依照內容自由調整 3 秒到 15 秒。';
+                else if (platform === 'Gemini Omni') descEl.innerHTML = '<span class="font-bold text-slate-700">【Gemini Omni 專屬規則】</span><br>固定 10 秒一個影片片段，每個片段可以有不同的分鏡及攝影運鏡。';
+                else if (platform === 'Runway') descEl.innerHTML = '<span class="font-bold text-slate-700">【Runway 專屬規則】</span><br>固定 10 秒一個影片片段，每個片段可以有不同的分鏡及攝影運鏡。';
+                else if (platform === 'AIReel') descEl.innerHTML = '<span class="font-bold text-slate-700">【AIReel 專屬規則】</span><br>分為 5, 8, 10, 15 秒一個影片片段。<br><span class="text-amber-600 font-bold">＊注意：15 秒片段為會員專屬功能＊</span>';
+                else if (platform === 'Seedance') descEl.innerHTML = '<span class="font-bold text-slate-700">【Seedance 專屬規則】</span><br>彈性時間，可設定 0 到 15 秒一個影片片段。';
+                else if (platform === 'Grok') descEl.innerHTML = '<span class="font-bold text-slate-700">【Grok 專屬規則】</span><br>分成 6 秒或 10 秒一個影片片段，每個片段可以有不同的分鏡及攝影運鏡。';
+            }
+        }
+
+        // File handling
+        if(dropZone) {
+            dropZone.onclick = () => fileInput.click();
+            dropZone.ondragover = (e) => { e.preventDefault(); dropZone.classList.add('border-slate-800'); };
+            dropZone.ondragleave = () => dropZone.classList.remove('border-slate-800');
+            dropZone.ondrop = (e) => {
+                e.preventDefault();
+                dropZone.classList.remove('border-slate-800');
+                window.handleFiles(e.dataTransfer.files);
+            };
+        }
+        if(fileInput) {
+            fileInput.onchange = (e) => window.handleFiles(e.target.files);
+        }
+
+        window.addLink = function() {
+            const linkInput = document.getElementById('linkInput');
+            const url = linkInput.value.trim();
+            if(!url) return;
+            
+            const id = Math.random().toString(36).substr(2, 9);
+            uploadedLinks.push({ id, url: url });
+            linkInput.value = '';
+            window.renderFileList();
+        };
+
+        window.removeLink = function(id) {
+            uploadedLinks = uploadedLinks.filter(l => l.id !== id);
+            window.renderFileList();
+        };
+
+        window.getMediaDuration = function(file) {
+            return new Promise((resolve) => {
+                const media = document.createElement(file.type.startsWith('audio/') ? 'audio' : 'video');
+                media.preload = 'metadata';
+                media.onloadedmetadata = function() {
+                    URL.revokeObjectURL(media.src);
+                    resolve(media.duration);
+                };
+                media.onerror = function() { resolve(0); }
+                media.src = URL.createObjectURL(file);
+            });
+        };
+
+        window.handleFiles = async function(files) {
+            for (const file of files) {
+                const id = Math.random().toString(36).substr(2, 9);
+                const fileObj = { id, name: file.name, type: file.type, status: 'processing' };
+                uploadedFiles.push(fileObj);
+                window.renderFileList();
+
+                try {
+                    let content = "";
+                    if (file.type === 'text/plain') {
+                        content = await file.text();
+                    } else if (file.type === 'application/pdf') {
+                        content = await window.extractPDFText(file);
+                    } else if (file.type === 'application/vnd.openxmlformats-officedocument.wordprocessingml.document') {
+                        content = await window.extractWordText(file);
+                    } else if (file.type.startsWith('image/')) {
+                        content = await window.fileToBase64(file); 
+                        fileObj.isImage = true;
+                        fileObj.base64 = content;
+                        content = `[圖片檔案：${file.name}]`;
+                    } else if (file.type.startsWith('audio/') || file.type.startsWith('video/')) {
+                        if (file.size > 20 * 1024 * 1024) {
+                            window.showError(`檔案 ${file.name} 過大！前端直連 API 限制為 20MB 內，請改用 YouTube 連結。`);
+                            fileObj.status = 'error';
+                            window.renderFileList();
+                            continue;
+                        }
+                        
+                        const duration = await window.getMediaDuration(file);
+                        if (duration > 0) {
+                            const lengthInput = document.getElementById('videoLength');
+                            const statusBadge = document.getElementById('videoLengthStatus');
+                            const styleSelect = document.getElementById('scriptStyle');
+                            
+                            lengthInput.value = Math.round(duration);
+                            lengthInput.classList.add('border-green-400', 'bg-green-50/30');
+                            statusBadge.classList.remove('hidden');
+                            
+                            if (styleSelect.value !== '音樂MV風格' && file.type.startsWith('audio/')) {
+                                styleSelect.value = '音樂MV風格';
+                                window.toggleCustomStyle();
+                            }
+                            lucide.createIcons();
+                        }
+
+                        content = await window.fileToBase64(file); 
+                        fileObj.isMedia = true; 
+                        fileObj.base64 = content;
+                        fileObj.mimeType = file.type;
+                        content = `[影音檔案：${file.name}，時長：${Math.round(duration)}秒]`;
+                    }
+                    
+                    if (fileObj.status !== 'error') {
+                        fileObj.content = content;
+                        fileObj.status = 'ready';
+                    }
+                } catch (err) { fileObj.status = 'error'; }
+                window.renderFileList();
+            }
+        }
+
+        window.renderFileList = function() {
+            let html = uploadedFiles.map(f => {
+                let icon = 'file-text';
+                if (f.type.startsWith('image/')) icon = 'image';
+                if (f.type.startsWith('audio/')) icon = 'music';
+                if (f.type.startsWith('video/')) icon = 'video';
+                
+                return `
+                <div class="flex items-center justify-between p-2.5 bg-slate-50 border border-slate-200 rounded-lg group">
+                    <div class="flex items-center gap-2 overflow-hidden">
+                        <i data-lucide="${icon}" class="w-4 h-4 text-slate-400 shrink-0"></i>
+                        <span class="text-xs truncate text-slate-600 font-medium">${f.name}</span>
+                    </div>
+                    <div class="flex items-center gap-2">
+                        ${f.status === 'processing' ? '<div class="w-3 h-3 border-2 border-slate-300 border-t-slate-600 rounded-full animate-spin"></div>' : ''}
+                        ${f.status === 'ready' ? '<i data-lucide="check-circle" class="w-3.5 h-3.5 text-green-500"></i>' : ''}
+                        ${f.status === 'error' ? '<i data-lucide="x-circle" class="w-3.5 h-3.5 text-red-500"></i>' : ''}
+                        <button onclick="removeFile('${f.id}')" class="p-1 hover:bg-slate-200 rounded text-slate-400 hover:text-red-500 transition-colors"><i data-lucide="trash-2" class="w-3.5 h-3.5"></i></button>
+                    </div>
+                </div>`;
+            }).join('');
+            
+            html += uploadedLinks.map(l => `
+                <div class="flex items-center justify-between p-2.5 bg-indigo-50 border border-indigo-100 rounded-lg group">
+                    <div class="flex items-center gap-2 overflow-hidden">
+                        <i data-lucide="link" class="w-4 h-4 text-indigo-400 shrink-0"></i>
+                        <a href="${l.url}" target="_blank" class="text-xs truncate text-indigo-600 font-medium hover:underline">${l.url}</a>
+                    </div>
+                    <div class="flex items-center gap-2">
+                        <i data-lucide="check-circle" class="w-3.5 h-3.5 text-green-500"></i>
+                        <button onclick="removeLink('${l.id}')" class="p-1 hover:bg-indigo-200 rounded text-indigo-400 hover:text-red-500 transition-colors"><i data-lucide="trash-2" class="w-3.5 h-3.5"></i></button>
+                    </div>
+                </div>
+            `).join('');
+
+            fileListDisplay.innerHTML = html;
+            lucide.createIcons();
+        }
+
+        window.removeFile = function(id) {
+            uploadedFiles = uploadedFiles.filter(f => f.id !== id);
+            window.renderFileList();
+        }
+
+        window.extractPDFText = function(file) {
+            return new Promise((resolve, reject) => {
+                const reader = new FileReader();
+                reader.onload = async () => {
+                    try {
+                        const pdfData = new Uint8Array(reader.result);
+                        const pdf = await pdfjsLib.getDocument({ data: pdfData }).promise;
+                        let text = "";
+                        for (let i = 1; i <= pdf.numPages; i++) {
+                            const page = await pdf.getPage(i);
+                            const content = await page.getTextContent();
+                            text += content.items.map(item => item.str).join(" ") + "\n";
+                        }
+                        resolve(text);
+                    } catch (e) { reject(e); }
+                };
+                reader.readAsArrayBuffer(file);
+            });
+        }
+
+        window.extractWordText = function(file) {
+            return new Promise((resolve, reject) => {
+                const reader = new FileReader();
+                reader.onload = async (e) => {
+                    try {
+                        const result = await mammoth.extractRawText({ arrayBuffer: e.target.result });
+                        resolve(result.value);
+                    } catch (e) { reject(e); }
+                };
+                reader.readAsArrayBuffer(file);
+            });
+        }
+
+        window.fileToBase64 = function(file) {
+            return new Promise((resolve, reject) => {
+                const reader = new FileReader();
+                reader.readAsDataURL(file);
+                reader.onload = () => resolve(reader.result.split(',')[1]);
+                reader.onerror = error => reject(error);
+            });
+        }
+
+        window.generateScript = async function() {
+            const apiKey = document.getElementById('apiKey').value.trim();
+            if (!apiKey) return window.showError("請輸入 Google Gemini API Key 才能開始生成腳本。");
+            
+            const additionalReq = document.getElementById('additionalRequirements') ? document.getElementById('additionalRequirements').value : '';
+            if (uploadedFiles.length === 0 && uploadedLinks.length === 0 && !additionalReq.trim()) {
+                return window.showError("請至少「上傳檔案/輸入連結」或填寫「腳本需求補充說明」，AI 才有足夠資訊為您創作腳本！");
+            }
+
+            const videoLength = document.getElementById('videoLength').value;
+            const aspectRatio = document.getElementById('aspectRatio').value;
+            const rawScriptStyle = document.getElementById('scriptStyle').value;
+            const scriptStyle = rawScriptStyle === '其他' ? (document.getElementById('customScriptStyle').value || '綜合風格') : rawScriptStyle;
+            const artStyle = document.getElementById('artStyle').value;
+
+            const btn = document.getElementById('genBtn');
+            document.getElementById('emptyState').classList.add('hidden');
+            document.getElementById('loadingState').classList.remove('hidden');
+            document.getElementById('scriptContent').classList.add('hidden');
+            btn.disabled = true;
+
+            let seconds = 0;
+            const timerEl = document.getElementById('timerText');
+            if (timerEl) timerEl.textContent = seconds;
+            const timerInterval = setInterval(() => { seconds++; if (timerEl) timerEl.textContent = seconds; }, 1000);
+
+            const textContents = uploadedFiles.filter(f => !f.isImage && !f.isMedia).map(f => f.content).join("\n\n---\n\n");
+            const images = uploadedFiles.filter(f => f.isImage);
+            const mediaFiles = uploadedFiles.filter(f => f.isMedia); 
+            const linksText = uploadedLinks.length > 0 ? "參考網頁與影音連結：\n" + uploadedLinks.map(l => l.url).join("\n") : "";
+
+            let platformTimeRules = "";
+            if (selectedPlatform === 'Runway') platformTimeRules = "【Runway 專屬規則】：切分每個影片片段 (scenes) 的 duration 必須剛好為 10 秒。每個片段內允許設計多個不同的分鏡與攝影運鏡。";
+            else if (selectedPlatform === 'KLINGAI') platformTimeRules = "【KLINGAI 專屬規則】：切分每個影片片段 (scenes) 的 duration 極度彈性，請依據劇情張力自由設定為 3 秒到 15 秒之間。";
+            else if (selectedPlatform === 'Gemini Omni') platformTimeRules = "【Gemini Omni 專屬規則】：切分每個影片片段 (scenes) 的 duration 必須剛好為 10 秒。每個片段內允許設計多個不同的分鏡與攝影運鏡。";
+            else if (selectedPlatform === 'AIReel') platformTimeRules = "【AIReel 專屬規則】：切分每個影片片段 (scenes) 的 duration 必須為 5、8、10 或 15 秒其中之一。若該片段為劇情高潮或使用者為會員，可使用 15 秒；否則預設使用 5, 8, 10 秒。";
+            else if (selectedPlatform === 'Seedance') platformTimeRules = "【Seedance 專屬規則】：切分每個影片片段 (scenes) 的 duration 極度彈性，請設定為 0 到 15 秒之間。";
+            else if (selectedPlatform === 'Grok') platformTimeRules = "【Grok 專屬規則】：切分每個影片片段 (scenes) 的 duration 必須剛好為 6 秒或 10 秒。每個片段內允許設計多個不同的分鏡與攝影運鏡。";
+
+            const prompt = `你現在是頂尖的影音競賽腳本顧問與電影級 MV 導演。請根據以下競賽簡章內容、上傳檔案、外部連結及使用者要求，撰寫一個極度詳盡、邏輯連貫的短影音或 MV 腳本。
+            
+            [競賽簡章與參考資料]
+            ${textContents}
+            ${linksText}
+            
+            [使用者設定 - 絕對嚴格遵守]
+            - 影片總時長: ${videoLength} 秒
+            - 影片畫面比例: ${aspectRatio}
+            - 影片腳本情緒風格: ${scriptStyle}
+            - 繪畫視覺風格: ${artStyle}
+            - 目標生成平台: ${selectedPlatform}
+            - 腳本需求補充說明 (極重要核心觀點): ${additionalReq || '無特別補充'}
+            
+            [腳本結構與極致專業要求]
+            1. **【最高指導原則：音樂 MV 鎖定模式】**
+                若使用者風格選擇「音樂MV風格」，或有上傳 MP3/提供音樂連結，這代表**「這是一首已經創作好的原創音樂」**。
+                - **絕對禁止修改歌詞**：請完美辨識出音檔內的歌詞，並原封不動地填入對應分鏡的 \`subtitle\` 中。
+                - **絕對配合音樂節奏**：背景畫面的切換必須完全依附音樂的節拍與段落 (前奏、主歌、副歌、間奏、尾奏)。
+                - 總分鏡時間加總必須完美吻合總時長 ${videoLength} 秒。
+            2. 短影音黃金架構策略 (極度重要)：
+                請將使用者的「腳本需求補充說明」深度融合，並將影片嚴格劃分為四個黃金階段。請在 \`narrativeStructure\` 中詳細寫出這四個階段的具體策略：
+                - HOOK (開頭前 3-5 秒)：如何瞬間抓住眼球、製造痛點或強烈共鳴。
+                - 承接 (Development)：如何展開主題、帶入情境或主角困境。
+                - 轉折 (Turn)：如何製造懸念、提出核心知識點或顛覆性解決方案 (若是MV，此處為副歌視覺高潮)。
+                - CTA (呼籲與金句)：結尾的行動呼籲，並務必留下一句讓人印象深刻的金句總結。
+            3. 前置視覺設定集 (Visual Bible)：
+                在分鏡開始前，先定義：
+                - 每一位主角的「定裝圖 Prompt」：明確包含「角色設定圖 (Character design sheet)」、「全身的正面、側面、背面 (full-body front, side, and back views)」、「6種臉部表情 (6 facial expressions)」，強制加入「使用純白背景 (pure white background)」，並強烈展現「${artStyle}」視覺風格。此定裝部分請一律強制要求「16:9 橫式畫面比例 (--ar 16:9 或 16:9 aspect ratio)」。
+                - 每一個關鍵場景的「概念圖 Prompt」：極度詳盡描述光影、建築、氛圍，必須符合「${artStyle}」風格，並同樣強制要求「16:9 橫式畫面比例 (16:9 aspect ratio)」。若有文字，強制「僅限使用英文 (English text only)」。
+            4. 專業配樂指導 (Suno AI Prompt)：
+                提供 \`overallBgmPrompt\`：這是一段給 Suno AI 的全片完整背景音樂英文提示詞，需精準判斷腳本氛圍。針對後續【每一個分鏡】，請在 \`sunoPrompt\` 欄位中填寫該段落專屬的「英文音樂情緒變化提示詞」。
+            5. SMART 平台時間模組 (絕對嚴格遵守)：
+                ${platformTimeRules}
+            6. 視覺與腳本高度一致性 (策略落地)：
+                該分鏡裡的「視覺分鏡 Visuals」、主角與環境設定，必須與「前置視覺設定集」完全對應。分鏡的 Prompt 必須標示「${artStyle}」風格與使用者指定的「${aspectRatio}」影片比例。
+            7. 輸出格式 (嚴格防呆指令): 請務必以 JSON 格式輸出。**絕對禁止省略任何欄位，每一個 JSON 鍵值都必須完整提供具體內容，絕不允許輸出 null 或空白！**`;
+
+            const parts = [{ text: prompt }];
+            images.forEach(img => { parts.push({ inlineData: { mimeType: img.type, data: img.base64 } }); });
+            mediaFiles.forEach(media => { parts.push({ inlineData: { mimeType: media.mimeType, data: media.base64 } }); });
+
+            const payload = {
+                contents: [{ parts }],
+                generationConfig: {
+                    responseMimeType: "application/json",
+                    responseSchema: {
+                        type: "OBJECT",
+                        properties: {
+                            title: { type: "STRING" },
+                            summary: { type: "STRING" },
+                            overallBgmPrompt: { type: "STRING" },
+                            visualAssets: {
+                                type: "OBJECT",
+                                properties: {
+                                    characters: {
+                                        type: "ARRAY",
+                                        items: { type: "OBJECT", properties: { name: { type: "STRING" }, designPromptZh: { type: "STRING" }, designPromptEn: { type: "STRING" } }, required: ["name", "designPromptZh", "designPromptEn"] }
+                                    },
+                                    environments: {
+                                        type: "ARRAY",
+                                        items: { type: "OBJECT", properties: { name: { type: "STRING" }, designPromptZh: { type: "STRING" }, designPromptEn: { type: "STRING" } }, required: ["name", "designPromptZh", "designPromptEn"] }
+                                    }
+                                }
+                            },
+                            narrativeStructure: {
+                                type: "OBJECT",
+                                properties: { hook: { type: "STRING" }, development: { type: "STRING" }, turn: { type: "STRING" }, cta: { type: "STRING" } },
+                                required: ["hook", "development", "turn", "cta"]
+                            },
+                            scenes: {
+                                type: "ARRAY",
+                                items: {
+                                    type: "OBJECT",
+                                    properties: {
+                                        sceneNumber: { type: "NUMBER" }, narrativeStage: { type: "STRING" }, duration: { type: "NUMBER" }, element: { type: "STRING" }, visualDescription: { type: "STRING" }, protagonist: { type: "STRING" }, setting: { type: "STRING" }, camera: { type: "STRING" }, audio: { type: "STRING" }, music: { type: "STRING" }, subtitle: { type: "STRING" }, sunoPrompt: { type: "STRING" }, platformPrompt: { type: "STRING" }, imagePromptZh: { type: "STRING" }, imagePromptEn: { type: "STRING" }
+                                    },
+                                    required: ["sceneNumber", "narrativeStage", "duration", "element", "visualDescription", "protagonist", "setting", "camera", "audio", "music", "subtitle", "sunoPrompt", "platformPrompt", "imagePromptZh", "imagePromptEn"]
+                                }
+                            }
+                        },
+                        required: ["title", "overallBgmPrompt", "visualAssets", "narrativeStructure", "scenes"]
+                    }
+                }
+            };
+
+            try {
+                // 升級至 3.5 Flash 端點
+                const response = await window.callGeminiWithRetry(apiKey, payload);
+                window.saveToHistory(response); 
+                window.displayScript(response);
+                
+                setTimeout(() => {
+                    const status = document.getElementById('cloudSyncStatus');
+                    if (status) {
+                        status.classList.remove('hidden');
+                        status.innerHTML = `<i data-lucide="cloud-check" class="w-3 h-3 text-green-500"></i><span class="text-green-500 font-bold">✅ 腳本已自動儲存至本機與雲端</span>`;
+                        lucide.createIcons();
+                    }
+                }, 1000);
+
+            } catch (err) {
+                window.showError("腳本生成中斷：" + err.message);
+                document.getElementById('emptyState').classList.remove('hidden');
+            } finally {
+                clearInterval(timerInterval);
+                document.getElementById('loadingState').classList.add('hidden');
+                btn.disabled = false;
+            }
+        };
+
+        window.callGeminiWithRetry = async function(apiKey, payload, retries = 2) {
+            for (let i = 0; i < retries; i++) {
+                try {
+                    const res = await fetch(`https://generativelanguage.googleapis.com/v1beta/models/gemini-3.5-flash:generateContent?key=${apiKey}`, {
+                        method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify(payload)
+                    });
+                    const data = await res.json();
+                    if (!res.ok) {
+                        if (res.status === 400 || res.status === 403) throw new Error(`[致命錯誤] 伺服器拒絕 (代碼 ${res.status}): ${data.error?.message || "請檢查您的 API Key 是否有效。"}`);
+                        throw new Error(data.error?.message || "伺服器繁忙");
+                    }
+                    const textResponse = data.candidates[0].content.parts[0].text;
+                    try {
+                        let cleaned = textResponse.replace(/```json/gi, '').replace(/```/g, '').trim();
+                        return JSON.parse(cleaned);
+                    } catch (parseErr) { throw new Error(`[致命錯誤] AI 產出的格式無法解析。建議縮短影片時長或減少細節要求。`); }
+                } catch (err) {
+                    if (err.message.includes('[致命錯誤]')) throw new Error(err.message.replace('[致命錯誤] ', ''));
+                    if (i === retries - 1) throw err;
+                    await new Promise(r => setTimeout(r, Math.pow(2, i) * 1500));
+                }
+            }
+        };
+
+        window.displayScript = function(data) {
+            window.lastScriptData = data; 
+            const container = document.getElementById('scriptContent');
+            const scriptStyleElement = document.getElementById('scriptStyle');
+            const scriptStyle = scriptStyleElement.value === '其他' ? (document.getElementById('customScriptStyle').value || '綜合風格') : scriptStyleElement.value;
+            
+            let sunoHTML = '';
+            if (data.overallBgmPrompt) {
+                sunoHTML = `<div class="bg-violet-50 border border-violet-100 rounded-2xl p-6 shadow-sm mb-6"><div class="flex items-center gap-2 mb-4"><i data-lucide="music" class="w-6 h-6 text-violet-600"></i><h3 class="text-lg font-bold text-violet-900">🎵 專屬配樂設定 (Suno AI BGM)</h3></div><p class="text-xs text-violet-600 mb-4 font-medium">💡 TONY老師專業提示：請將以下英文提示詞直接複製到 Suno AI，生成完美契合影片風格與核心觀點的專屬配樂。</p><div class="group/prompt relative bg-slate-900 p-4 rounded-xl shadow-inner"><p class="text-[10px] font-bold text-violet-400 mb-2 uppercase tracking-widest">全片完整配樂 Prompt</p><p class="text-[13px] text-slate-200 font-mono leading-relaxed pr-8">${data.overallBgmPrompt}</p><button onclick="copyToClipboard('${(data.overallBgmPrompt || '').replace(/'/g, "\\'")}')" class="absolute right-4 top-4 text-violet-400 hover:text-white opacity-0 group-hover/prompt:opacity-100 transition-opacity"><i data-lucide="copy" class="w-5 h-5"></i></button></div></div>`;
+            }
+
+            let visualAssetsHTML = '';
+            if (data.visualAssets) {
+                visualAssetsHTML = `<div class="bg-indigo-50 border border-indigo-100 rounded-2xl p-6 shadow-sm mb-6"><div class="flex items-center gap-2 mb-4"><i data-lucide="palette" class="w-6 h-6 text-indigo-600"></i><h3 class="text-lg font-bold text-indigo-900">🎨 視覺設定集 (Visual Bible) - <span class="text-indigo-600 text-sm">16:9 橫式定裝</span></h3></div><p class="text-xs text-indigo-600 mb-6 font-medium">💡 TONY老師專業提示：請先使用以下提示詞產出角色定裝圖與場景概念圖，確保後續分鏡生成風格一致。</p><div class="space-y-6">
+                ${data.visualAssets.characters ? data.visualAssets.characters.map(c => `<div class="bg-white rounded-xl p-4 shadow-sm border border-indigo-50"><h4 class="text-sm font-bold text-slate-800 mb-3 border-b border-slate-100 pb-2">🧑‍🎤 角色定裝：${c.name || '未命名角色'}</h4><div class="grid grid-cols-1 md:grid-cols-2 gap-4"><div class="group/prompt relative bg-slate-50 p-3 rounded-lg border border-slate-100"><p class="text-[10px] font-bold text-indigo-500 mb-1">中文定裝提示詞：</p><p class="text-[11px] text-slate-600 font-mono leading-relaxed pr-6">${c.designPromptZh || 'AI 正在思考中...'}</p><button onclick="copyToClipboard('${(c.designPromptZh || '').replace(/'/g, "\\'")}')" class="absolute right-2 top-3 text-indigo-400 hover:text-indigo-600 opacity-0 group-hover/prompt:opacity-100 transition-opacity"><i data-lucide="copy" class="w-4 h-4"></i></button></div><div class="group/prompt relative bg-slate-800 p-3 rounded-lg"><p class="text-[10px] font-bold text-indigo-400 mb-1">English Prompt:</p><p class="text-[11px] text-slate-300 font-mono leading-relaxed pr-6">${c.designPromptEn || 'AI thinking...'}</p><button onclick="copyToClipboard('${(c.designPromptEn || '').replace(/'/g, "\\'")}')" class="absolute right-2 top-3 text-indigo-400 hover:text-white opacity-0 group-hover/prompt:opacity-100 transition-opacity"><i data-lucide="copy" class="w-4 h-4"></i></button></div></div></div>`).join('') : ''}
+                ${data.visualAssets.environments ? data.visualAssets.environments.map(e => `<div class="bg-white rounded-xl p-4 shadow-sm border border-indigo-50"><h4 class="text-sm font-bold text-slate-800 mb-3 border-b border-slate-100 pb-2">🌄 場景設定：${e.name || '主場景'}</h4><div class="grid grid-cols-1 md:grid-cols-2 gap-4"><div class="group/prompt relative bg-slate-50 p-3 rounded-lg border border-slate-100"><p class="text-[10px] font-bold text-indigo-500 mb-1">中文概念圖提示詞：</p><p class="text-[11px] text-slate-600 font-mono leading-relaxed pr-6">${e.designPromptZh || 'AI 正在思考中...'}</p><button onclick="copyToClipboard('${(e.designPromptZh || '').replace(/'/g, "\\'")}')" class="absolute right-2 top-3 text-indigo-400 hover:text-indigo-600 opacity-0 group-hover/prompt:opacity-100 transition-opacity"><i data-lucide="copy" class="w-4 h-4"></i></button></div><div class="group/prompt relative bg-slate-800 p-3 rounded-lg"><p class="text-[10px] font-bold text-indigo-400 mb-1">English Prompt:</p><p class="text-[11px] text-slate-300 font-mono leading-relaxed pr-6">${e.designPromptEn || 'AI thinking...'}</p><button onclick="copyToClipboard('${(e.designPromptEn || '').replace(/'/g, "\\'")}')" class="absolute right-2 top-3 text-indigo-400 hover:text-white opacity-0 group-hover/prompt:opacity-100 transition-opacity"><i data-lucide="copy" class="w-4 h-4"></i></button></div></div></div>`).join('') : ''}
+                </div></div>`;
+            }
+
+            let narrativeHTML = '';
+            if (data.narrativeStructure) {
+                const stageMap = { hook: { title: '1. HOOK (吸引)', color: 'border-l-rose-500', bg: 'bg-rose-50', text: 'text-rose-900', icon: 'zap' }, development: { title: '2. 承接 (展開)', color: 'border-l-blue-500', bg: 'bg-blue-50', text: 'text-blue-900', icon: 'trending-up' }, turn: { title: '3. 轉折 (懸念/知識點)', color: 'border-l-amber-500', bg: 'bg-amber-50', text: 'text-amber-900', icon: 'lightbulb' }, cta: { title: '4. CTA (呼籲與金句)', color: 'border-l-emerald-500', bg: 'bg-emerald-50', text: 'text-emerald-900', icon: 'megaphone' } };
+                narrativeHTML = `<div class="bg-white rounded-2xl p-6 shadow-sm border border-slate-200 mb-6"><div class="flex items-center gap-2 mb-4"><i data-lucide="layout-template" class="w-6 h-6 text-slate-800"></i><h3 class="text-lg font-bold text-slate-800">📋 短影音黃金架構策略</h3></div><p class="text-xs text-slate-500 mb-4 font-medium">基於您的「核心觀點補充說明」所建構的故事脈絡</p><div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+                ${Object.entries(data.narrativeStructure).map(([key, val]) => { const config = stageMap[key] || { title: key, color: 'border-l-slate-500', bg: 'bg-slate-50', text: 'text-slate-900', icon: 'file-text' }; return `<div class="${config.bg} p-4 rounded-xl border-l-4 ${config.color} shadow-sm"><div class="flex items-center gap-2 mb-2"><i data-lucide="${config.icon}" class="w-4 h-4 ${config.text} opacity-70"></i><p class="text-xs font-black ${config.text} uppercase tracking-widest">${config.title}</p></div><p class="text-sm font-medium text-slate-700 leading-snug">${val || '無特定策略'}</p></div>`; }).join('')}
+                </div></div>`;
+            }
+
+            container.innerHTML = `<div class="bg-slate-800 text-white p-6 rounded-2xl shadow-inner relative overflow-hidden mb-6"><div class="flex items-center gap-2 mb-2 relative z-10"><span class="bg-slate-700 text-slate-300 text-xs px-2 py-0.5 rounded font-bold uppercase tracking-wider">${scriptStyle}</span><span class="bg-amber-500 text-amber-900 text-xs px-2 py-0.5 rounded font-bold uppercase tracking-wider">${selectedPlatform}</span></div><h2 class="text-2xl font-bold mb-2 relative z-10">${data.title || '未命名腳本'}</h2><p class="text-slate-300 text-sm leading-relaxed relative z-10">${data.summary || "專業競賽腳本已生成。"}</p><div class="absolute -right-8 -top-8 text-white/5"><i data-lucide="quote" class="w-32 h-32"></i></div></div>
+                ${sunoHTML}${narrativeHTML}${visualAssetsHTML}
+                <div class="space-y-6">
+                    ${data.scenes.map(s => {
+                        let stageColor = 'bg-slate-700 text-slate-200 border-slate-600';
+                        if(s.narrativeStage) {
+                            if(s.narrativeStage.includes('HOOK')) stageColor = 'bg-rose-100 text-rose-700 border-rose-200';
+                            else if(s.narrativeStage.includes('承接')) stageColor = 'bg-blue-100 text-blue-700 border-blue-200';
+                            else if(s.narrativeStage.includes('轉折')) stageColor = 'bg-amber-100 text-amber-700 border-amber-200';
+                            else if(s.narrativeStage.includes('CTA')) stageColor = 'bg-emerald-100 text-emerald-700 border-emerald-200';
+                        }
+                        return `<div class="group bg-white rounded-2xl border border-slate-200 shadow-sm overflow-hidden hover:border-slate-400 transition-all"><div class="flex items-center justify-between px-6 py-3 bg-slate-50 border-b border-slate-100"><div class="flex items-center gap-3"><span class="bg-slate-800 text-white text-xs font-bold px-2.5 py-1 rounded-full">SCENE ${s.sceneNumber || '-'}</span>${s.narrativeStage ? `<span class="text-[10px] font-bold px-2 py-0.5 rounded border ${stageColor}">${s.narrativeStage}</span>` : ''}<span class="text-xs font-medium text-slate-500">${s.duration || 0}秒 | ${s.element || '腳本段落'}</span></div><button onclick="copyToClipboard('${(s.platformPrompt || '').replace(/'/g, "\\'")}')" class="text-slate-400 hover:text-slate-800 transition-colors"><i data-lucide="copy" class="w-4 h-4"></i></button></div><div class="p-6 grid grid-cols-1 md:grid-cols-2 gap-8"><div class="space-y-4"><div><h4 class="text-xs font-bold text-slate-400 uppercase tracking-wider mb-2">視覺分鏡 Visuals</h4><p class="text-sm text-slate-700 leading-relaxed font-medium">${s.visualDescription || '（AI 建構中，請參考提示詞）'}</p></div><div class="grid grid-cols-2 gap-4"><div><p class="text-[10px] font-bold text-slate-400 uppercase mb-1">主角 Protagonist</p><p class="text-xs text-slate-600">${s.protagonist || "無特定主角"}</p></div><div><p class="text-[10px] font-bold text-slate-400 uppercase mb-1">運鏡 Camera</p><p class="text-xs text-slate-600">${s.camera || "固定鏡頭"}</p></div></div></div><div class="space-y-4"><div class="bg-slate-50 p-4 rounded-xl border border-slate-100"><div class="flex justify-between items-start mb-2"><h4 class="text-xs font-bold text-slate-400 uppercase tracking-wider">腳本字幕 Subtitle</h4>${s.sunoPrompt ? `<div class="group/suno relative flex items-center gap-1 bg-violet-100 text-violet-700 px-2 py-1 rounded text-[10px] font-bold cursor-pointer" onclick="copyToClipboard('${s.sunoPrompt.replace(/'/g, "\\'")}')"><i data-lucide="music" class="w-3 h-3"></i> 分段音樂指示<div class="absolute right-0 bottom-full mb-1 hidden group-hover/suno:block w-48 p-2 bg-slate-800 text-white text-[10px] rounded shadow-lg z-20 font-mono leading-relaxed">${s.sunoPrompt}<p class="text-violet-300 mt-1 text-[9px] border-t border-slate-600 pt-1">點擊即可複製</p></div></div>` : ''}</div><p class="text-sm text-slate-800 font-bold italic">"${s.subtitle || '(無字幕)'}"</p><p class="text-xs text-slate-500 mt-2">口白: ${s.audio || '(無口白)'}</p><p class="text-[11px] text-slate-400 mt-2 border-t border-slate-200 pt-2">環境音效: ${s.music || '(無特殊音效)'}</p></div><div class="bg-slate-900 p-4 rounded-xl"><h4 class="text-[10px] font-bold text-slate-500 uppercase tracking-wider mb-2">${selectedPlatform} 動態影像 PROMPT</h4><p class="text-[11px] text-slate-300 font-mono leading-relaxed line-clamp-3 group-hover:line-clamp-none transition-all">${s.platformPrompt || 'Prompt generation failed'}</p></div><div class="bg-amber-50 p-4 rounded-xl border border-amber-100"><div class="flex items-center justify-between mb-2"><h4 class="text-[10px] font-bold text-amber-700 uppercase tracking-wider">Nano Banana 2 靜態圖像 Prompt</h4></div><div class="space-y-2"><div class="group/prompt relative"><p class="text-[10px] font-bold text-amber-600 mb-1">中文：</p><p class="text-[11px] text-slate-700 font-mono leading-relaxed pr-6">${s.imagePromptZh || 'AI生成中...'}</p><button onclick="copyToClipboard('${(s.imagePromptZh || '').replace(/'/g, "\\'")}')" class="absolute right-0 top-4 text-amber-400 hover:text-amber-600 opacity-0 group-hover/prompt:opacity-100 transition-opacity"><i data-lucide="copy" class="w-3.5 h-3.5"></i></button></div><div class="group/prompt relative pt-2 border-t border-amber-200/50"><p class="text-[10px] font-bold text-amber-600 mb-1">English:</p><p class="text-[11px] text-slate-700 font-mono leading-relaxed pr-6">${s.imagePromptEn || 'AI thinking...'}</p><button onclick="copyToClipboard('${(s.imagePromptEn || '').replace(/'/g, "\\'")}')" class="absolute right-0 top-4 text-amber-400 hover:text-amber-600 opacity-0 group-hover/prompt:opacity-100 transition-opacity"><i data-lucide="copy" class="w-3.5 h-3.5"></i></button></div></div></div></div></div></div>`;
+                    }).join('')}
+                </div>`;
+            
+            container.classList.remove('hidden');
+            document.getElementById('downloadBtn').classList.remove('hidden');
+            lucide.createIcons();
+            container.scrollIntoView({ behavior: 'smooth' });
+        }
+
+        window.copyToClipboard = async function(text) {
+            try {
+                const textArea = document.createElement("textarea");
+                textArea.value = text;
+                document.body.appendChild(textArea);
+                textArea.select();
+                document.execCommand('copy');
+                document.body.removeChild(textArea);
+            } catch (err) {}
+        }
+
+        window.downloadScript = function() {
+            if (!window.lastScriptData) return;
+            const data = window.lastScriptData;
+            const header = "<html xmlns:o='urn:schemas-microsoft-com:office:office' xmlns:w='urn:schemas-microsoft-com:office:word' xmlns='http://www.w3.org/TR/REC-html40'><head><meta charset='utf-8'><title>腳本匯出</title><style>body { font-family: 'Microsoft JhengHei', 'PingFang TC', sans-serif; line-height: 1.6; color: #333; } .scene { border-bottom: 2px solid #e2e8f0; padding-bottom: 20px; margin-bottom: 20px; } h2, h3, h4 { color: #1e293b; } .prompt-box { background-color: #f8fafc; padding: 10px; border-left: 4px solid #cbd5e1; margin-top: 10px; font-family: monospace; font-size: 12px;} .visual-asset { background-color: #eef2ff; padding: 15px; border-radius: 8px; margin-bottom: 15px; border-left: 5px solid #4f46e5; } .narrative-box { background-color: #f8fafc; padding: 15px; border: 1px solid #e2e8f0; border-radius: 8px; margin-bottom: 20px; } .stage-tag { display: inline-block; padding: 2px 6px; background: #e2e8f0; font-size: 12px; border-radius: 4px; font-weight: bold; margin-left: 10px; } .suno-box { background-color: #f5f3ff; padding: 15px; border: 1px solid #ddd6fe; border-radius: 8px; margin-bottom: 20px; border-left: 5px solid #8b5cf6; }</style></head><body>";
+            const footer = "</body></html>";
+            let html = `<h2>AI短影音競賽腳本</h2><h3>${data.title || '未命名腳本'}</h3><p><strong>腳本摘要：</strong>${data.summary || ''}</p><hr/>`;
+            
+            if (data.overallBgmPrompt) html += `<h3>🎵 專屬配樂設定 (Suno AI BGM)</h3><div class='suno-box'><p><strong>全片完整配樂 Prompt：</strong><br/><span style='font-family: monospace;'>${data.overallBgmPrompt}</span></p></div><hr/>`;
+            if (data.narrativeStructure) html += `<h3>📋 短影音黃金架構策略</h3><div class='narrative-box'><p><strong>1. HOOK (吸引)：</strong><br/>${data.narrativeStructure.hook || ''}</p><p><strong>2. 承接 (展開)：</strong><br/>${data.narrativeStructure.development || ''}</p><p><strong>3. 轉折 (懸念/知識點)：</strong><br/>${data.narrativeStructure.turn || ''}</p><p><strong>4. CTA (呼籲與金句)：</strong><br/>${data.narrativeStructure.cta || ''}</p></div><hr/>`;
+            if (data.visualAssets) {
+                html += "<h3>🎨 視覺設定集 (Visual Bible)</h3>";
+                if (data.visualAssets.characters) data.visualAssets.characters.forEach(c => { html += `<div class='visual-asset'><h4>🧑‍🎤 角色定裝：${c.name || '未命名角色'}</h4><p><strong>中文提示詞：</strong><br/>${c.designPromptZh || ''}</p><p><strong>English Prompt：</strong><br/>${c.designPromptEn || ''}</p></div>`; });
+                if (data.visualAssets.environments) data.visualAssets.environments.forEach(e => { html += `<div class='visual-asset'><h4>🌄 場景設定：${e.name || '主場景'}</h4><p><strong>中文提示詞：</strong><br/>${e.designPromptZh || ''}</p><p><strong>English Prompt：</strong><br/>${e.designPromptEn || ''}</p></div>`; });
+                html += "<hr/>";
+            }
+            data.scenes.forEach(s => {
+                html += `<div class='scene'><h4>SCENE ${s.sceneNumber || '-'} (${s.duration || 0}秒) - ${s.element || ''}${s.narrativeStage ? `<span class='stage-tag'>${s.narrativeStage}</span>` : ""}</h4><p><strong>【視覺分鏡】</strong><br/>${s.visualDescription || ''}</p><p><strong>【設定與運鏡】</strong><br/>主角：${s.protagonist || ''}<br/>場景：${s.setting || ''}<br/>運鏡：${s.camera || ''}</p><p><strong>【聲音與字幕】</strong><br/>口白：${s.audio || ''}<br/>字幕：${s.subtitle || ''}<br/>配樂/氛圍：${s.music || ''}</p>`;
+                if (s.sunoPrompt) html += `<p><strong>【Suno 分段配樂指示】</strong><br/><span style='font-family: monospace; color: #6d28d9;'>${s.sunoPrompt}</span></p>`;
+                html += `<div class='prompt-box'><p><strong>【${selectedPlatform} 動態影像 Prompt】</strong><br/>${s.platformPrompt || ''}</p></div><div class='prompt-box'><p><strong>【Nano Banana 2 靜態圖像 Prompt (中文)】</strong><br/>${s.imagePromptZh || ''}</p></div><div class='prompt-box'><p><strong>【Nano Banana 2 靜態圖像 Prompt (EN)】</strong><br/>${s.imagePromptEn || ''}</p></div></div>`;
+            });
+
+            const blob = new Blob(['\ufeff', header + html + footer], { type: 'application/msword' });
+            const link = document.createElement('a');
+            link.href = URL.createObjectURL(blob);
+            link.download = `AI短影音腳本創作_${new Date().toLocaleDateString()}.doc`;
+            document.body.appendChild(link);
+            link.click();
+            document.body.removeChild(link);
+        }
+
+        // 初始化
+        window.addEventListener('DOMContentLoaded', () => {
+            window.loadHistory();
+            lucide.createIcons();
+        });
+    </script>
+</body>
+</html>
