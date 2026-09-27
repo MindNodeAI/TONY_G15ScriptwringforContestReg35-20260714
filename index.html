@@ -147,7 +147,7 @@
             <div class="flex items-center gap-3">
                 <img src="https://i.postimg.cc/fT2sQW09/1.png" alt="Logo" class="h-10">
                 <h1 class="text-xl font-bold tracking-tight text-white">AI短影音競賽腳本創作 <span class="text-amber-400">APP</span></h1>
-                <span class="ml-2 bg-gradient-to-r from-amber-500 to-orange-500 text-white text-[10px] font-bold px-2.5 py-1 rounded-full shadow-[0_0_10px_rgba(245,158,11,0.5)] border border-amber-300/50 whitespace-nowrap">Gemini 3.5 Flash 正式版</span>
+                <span class="ml-2 bg-gradient-to-r from-amber-500 to-orange-500 text-white text-[10px] font-bold px-2.5 py-1 rounded-full shadow-[0_0_10px_rgba(245,158,11,0.5)] border border-amber-300/50 whitespace-nowrap">Gemini 3.8 Flash 正式版</span>
             </div>
         </nav>
 
@@ -234,6 +234,7 @@
                                 <option value="日常紀錄">日常紀錄</option>
                                 <option value="永續減碳零廢棄環保">永續減碳零廢棄環保</option>
                                 <option value="地球永續生物多樣性">地球永續生物多樣性</option>
+                                <option value="2050 永續生活願景">2050 永續生活願景</option>
                                 <option value="其他">其他 (自行填寫)</option>
                             </select>
                             <input type="text" id="customScriptStyle" class="hidden mt-3 w-full bg-indigo-50 border border-indigo-200 rounded-xl px-4 py-2 focus:ring-2 focus:ring-indigo-400 outline-none transition-all text-sm placeholder-indigo-300 text-indigo-900" placeholder="請輸入您想要的腳本情緒風格...">
@@ -241,14 +242,38 @@
 
                         <div>
                             <label class="block text-sm font-medium text-slate-600 mb-2">繪畫視覺風格</label>
-                            <select id="artStyle" class="w-full bg-slate-50 border border-slate-200 rounded-xl px-4 py-2.5 focus:ring-2 focus:ring-slate-400 outline-none">
-                                <option value="4K 電影寫實">4K 電影寫實</option>
-                                <option value="3D 迪士尼卡通">3D 迪士尼卡通</option>
-                                <option value="日式動漫風">日式動漫風</option>
-                                <option value="極簡扁平">極簡扁平</option>
-                                <option value="賽博龐克">賽博龐克</option>
-                                <option value="古典水墨">古典水墨</option>
+                            <select id="artStyle" class="w-full bg-slate-50 border border-slate-200 rounded-xl px-4 py-2.5 focus:ring-2 focus:ring-slate-400 outline-none appearance-none cursor-pointer">
+                                <option value="電影寫實 Cinematic Realism (適合品牌片、紀錄感、商業影片)">1. 電影寫實 Cinematic Realism</option>
+                                <option value="3D 動畫電影 3D Animated Feature, expressive character, soft global illumination, cinematic lighting (適合故事短片、教育動畫、角色 IP)">2. 3D 動畫電影 3D Animated Feature</option>
+                                <option value="日系動畫 Anime / Cel Animation (適合青春、校園、冒險、角色型敘事)">3. 日系動畫 Anime / Cel Animation</option>
+                                <option value="水彩插畫 Watercolor (適合詩意、人文、旅行、療癒、回憶)">4. 水彩插畫 Watercolor</option>
+                                <option value="油畫藝術 Oil Painting (適合歷史、哲學、人物傳記、史詩感)">5. 油畫藝術 Oil Painting</option>
+                                <option value="繪本童話 Storybook Illustration (適合兒童、寓言、教育、文化故事)">6. 繪本童話 Storybook Illustration</option>
+                                <option value="東方水墨 Chinese Ink / Oriental Painting (適合詩詞、歷史、文化、禪意、東方美學)">7. 東方水墨 Chinese Ink / Oriental Painting</option>
+                                <option value="超現實概念藝術 Surreal Conceptual Art (適合 AI、未來、哲學、心理、抽象概念)">8. 超現實概念藝術 Surreal Conceptual Art</option>
                             </select>
+                            <p class="mt-2 text-[11px] text-slate-500 font-medium">💡 選單包含風格名稱與系統底層優化提示詞，幫助生成最契合情境的畫面。</p>
+                        </div>
+
+                        <!-- 流量密碼設定區 -->
+                        <div>
+                            <label class="block text-sm font-medium text-slate-600 mb-2 flex items-center gap-2">
+                                流量密碼設定
+                                <span class="text-[10px] bg-rose-100 text-rose-600 px-2 py-0.5 rounded-full font-bold">最多選 3 項</span>
+                            </label>
+                            <div class="flex flex-wrap gap-2" id="trafficCodeList">
+                                <button type="button" onclick="toggleTrafficCode('原始慾望', this)" class="traffic-btn px-3 py-1.5 text-xs border border-slate-200 rounded-lg bg-white text-slate-600 hover:bg-slate-50 transition-colors">1. 原始慾望</button>
+                                <button type="button" onclick="toggleTrafficCode('認知反差', this)" class="traffic-btn px-3 py-1.5 text-xs border border-slate-200 rounded-lg bg-white text-slate-600 hover:bg-slate-50 transition-colors">2. 認知反差</button>
+                                <button type="button" onclick="toggleTrafficCode('羊群效應', this)" class="traffic-btn px-3 py-1.5 text-xs border border-slate-200 rounded-lg bg-white text-slate-600 hover:bg-slate-50 transition-colors">3. 羊群效應</button>
+                                <button type="button" onclick="toggleTrafficCode('動態優先', this)" class="traffic-btn px-3 py-1.5 text-xs border border-slate-200 rounded-lg bg-white text-slate-600 hover:bg-slate-50 transition-colors">4. 動態優先</button>
+                                <button type="button" onclick="toggleTrafficCode('跨界組合', this)" class="traffic-btn px-3 py-1.5 text-xs border border-slate-200 rounded-lg bg-white text-slate-600 hover:bg-slate-50 transition-colors">5. 跨界組合</button>
+                                <button type="button" onclick="toggleTrafficCode('條件限定', this)" class="traffic-btn px-3 py-1.5 text-xs border border-slate-200 rounded-lg bg-white text-slate-600 hover:bg-slate-50 transition-colors">6. 條件限定</button>
+                                <button type="button" onclick="toggleTrafficCode('扮豬吃虎', this)" class="traffic-btn px-3 py-1.5 text-xs border border-slate-200 rounded-lg bg-white text-slate-600 hover:bg-slate-50 transition-colors">7. 扮豬吃虎</button>
+                                <button type="button" onclick="toggleTrafficCode('權威加持', this)" class="traffic-btn px-3 py-1.5 text-xs border border-slate-200 rounded-lg bg-white text-slate-600 hover:bg-slate-50 transition-colors">8. 權威加持</button>
+                                <button type="button" onclick="toggleTrafficCode('損失厭惡', this)" class="traffic-btn px-3 py-1.5 text-xs border border-slate-200 rounded-lg bg-white text-slate-600 hover:bg-slate-50 transition-colors">9. 損失厭惡</button>
+                                <button type="button" onclick="toggleTrafficCode('製造懸念', this)" class="traffic-btn px-3 py-1.5 text-xs border border-slate-200 rounded-lg bg-white text-slate-600 hover:bg-slate-50 transition-colors">10. 製造懸念</button>
+                                <button type="button" onclick="toggleTrafficCode('物物交換', this)" class="traffic-btn px-3 py-1.5 text-xs border border-slate-200 rounded-lg bg-white text-slate-600 hover:bg-slate-50 transition-colors">11. 物物交換</button>
+                            </div>
                         </div>
 
                         <div>
@@ -401,7 +426,7 @@
                                 <i data-lucide="brain-circuit" class="w-8 h-8 text-amber-500 absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2"></i>
                             </div>
                             <div class="text-center space-y-2">
-                                <p class="text-slate-800 font-bold text-lg loading-dots">Gemini 3.5 Flash 深度推理中，依據平台特性建構分鏡</p>
+                                <p class="text-slate-800 font-bold text-lg loading-dots">Gemini 3.8 Flash 深度推理中，依據平台特性建構分鏡</p>
                                 <p class="text-slate-500 text-sm bg-slate-100 py-1.5 px-4 rounded-full inline-block">
                                     耗時約 5~20 秒，目前已執行 <span id="timerText" class="font-mono text-amber-600 font-bold text-base">0</span> 秒...
                                 </p>
@@ -434,7 +459,7 @@
             <div class="flex items-center gap-3">
                 <i data-lucide="shield-check" class="w-8 h-8 text-indigo-400"></i>
                 <h1 class="text-xl font-bold tracking-tight text-white">SaaS 管理者後台</h1>
-                <span class="ml-2 bg-gradient-to-r from-amber-500 to-orange-500 text-white text-[10px] font-bold px-2.5 py-1 rounded-full shadow-[0_0_10px_rgba(245,158,11,0.5)] border border-amber-300/50 whitespace-nowrap">Gemini 3.5 Flash 正式版</span>
+                <span class="ml-2 bg-gradient-to-r from-amber-500 to-orange-500 text-white text-[10px] font-bold px-2.5 py-1 rounded-full shadow-[0_0_10px_rgba(245,158,11,0.5)] border border-amber-300/50 whitespace-nowrap">Gemini 3.8 Flash 正式版</span>
             </div>
         </nav>
 
@@ -458,7 +483,7 @@
                     <h2 class="text-lg font-bold text-slate-800 flex items-center gap-2">
                         <i data-lucide="bar-chart-2" class="w-5 h-5 text-amber-500"></i> 營運數據 AI 洞察分析
                     </h2>
-                    <span class="text-xs font-bold bg-amber-100 text-amber-700 px-3 py-1 rounded-full">Gemini 3.5 Flash Powered</span>
+                    <span class="text-xs font-bold bg-amber-100 text-amber-700 px-3 py-1 rounded-full">Gemini 3.8 Flash Powered</span>
                 </div>
                 <div class="p-6">
                     <div class="flex flex-col md:flex-row items-end gap-4 mb-4">
@@ -1082,7 +1107,7 @@
         window.callGeminiTextWithRetry = async function(apiKey, payload, retries = 2) {
             for (let i = 0; i < retries; i++) {
                 try {
-                    const res = await fetch(`https://generativelanguage.googleapis.com/v1beta/models/gemini-3.5-flash:generateContent?key=${apiKey}`, {
+                    const res = await fetch(`https://generativelanguage.googleapis.com/v1beta/models/gemini-3.8-flash:generateContent?key=${apiKey}`, {
                         method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify(payload)
                     });
                     const data = await res.json();
@@ -1217,6 +1242,27 @@
         let selectedPlatform = 'KLINGAI';
         let uploadedFiles = [];
         let uploadedLinks = []; 
+        let selectedTrafficCodes = []; // 儲存使用者選擇的流量密碼
+
+        window.toggleTrafficCode = function(code, btn) {
+            const index = selectedTrafficCodes.indexOf(code);
+            if (index > -1) {
+                // 取消選取
+                selectedTrafficCodes.splice(index, 1);
+                btn.classList.remove('bg-rose-500', 'text-white', 'border-rose-600', 'shadow-md');
+                btn.classList.add('bg-white', 'text-slate-600', 'border-slate-200');
+            } else {
+                // 檢查是否超過3個
+                if (selectedTrafficCodes.length >= 3) {
+                    window.showError("💡 最多只能選擇 3 項流量密碼喔！請先取消其他選項。");
+                    return;
+                }
+                // 新增選取
+                selectedTrafficCodes.push(code);
+                btn.classList.remove('bg-white', 'text-slate-600', 'border-slate-200');
+                btn.classList.add('bg-rose-500', 'text-white', 'border-rose-600', 'shadow-md');
+            }
+        };
 
         window.toggleCustomStyle = function() {
             const select = document.getElementById('scriptStyle');
@@ -1691,7 +1737,9 @@
             else if (selectedPlatform === 'Gemini Omni') platformTimeRules = "【Gemini Omni 專屬規則】：切分每個影片片段 (scenes) 的 duration 必須剛好為 10 秒。每個片段內允許設計多個不同的分鏡與攝影運鏡。";
             else if (selectedPlatform === 'AIReel') platformTimeRules = "【AIReel 專屬規則】：切分每個影片片段 (scenes) 的 duration 必須為 5、8、10 或 15 秒其中之一。若該片段為劇情高潮或使用者為會員，可使用 15 秒；否則預設使用 5, 8, 10 秒。";
             else if (selectedPlatform === 'Seedance') platformTimeRules = "【Seedance 專屬規則】：切分每個影片片段 (scenes) 的 duration 極度彈性，請設定為 0 到 15 秒之間。";
-            else if (selectedPlatform === 'Grok') platformTimeRules = "【Grok 專屬規則】：切分每個影片片段 (scenes) 的 duration 必須剛好為 6 秒或 10 秒。每個片段內允許設計多個不同的分鏡與攝影運鏡。";
+            else if (selectedPlatform === 'Grok') platformTimeRules = "【Grok 專屬規則】：切分每個影片片段 (scenes) 的 duration 必須剛好為 6 秒 或 10 秒。每個片段內允許設計多個不同的分鏡與攝影運鏡。";
+
+            const trafficCodesStr = selectedTrafficCodes.length > 0 ? selectedTrafficCodes.join("、") : "無特別指定";
 
             const prompt = `你現在是頂尖的影音競賽腳本顧問與電影級 MV 導演。請根據以下競賽簡章內容、上傳檔案、外部連結及使用者要求，撰寫一個極度詳盡、邏輯連貫的短影音或 MV 腳本。
             
@@ -1704,6 +1752,7 @@
             - 影片畫面比例: ${aspectRatio}
             - 影片腳本情緒風格: ${scriptStyle}
             - 繪畫視覺風格: ${artStyle}
+            - 流量密碼 (爆款行銷心理學): ${trafficCodesStr}
             - 目標生成平台: ${selectedPlatform}
             - 腳本需求補充說明 (極重要核心觀點): ${additionalReq || '無特別補充'}
             
@@ -1714,7 +1763,7 @@
                 - **絕對配合音樂節奏**：背景畫面的切換必須完全依附音樂的節拍與段落 (前奏、主歌、副歌、間奏、尾奏)。
                 - 總分鏡時間加總必須完美吻合總時長 ${videoLength} 秒。
             2. 短影音黃金架構策略 (極度重要)：
-                請將使用者的「腳本需求補充說明」深度融合，並將影片嚴格劃分為四個黃金階段。請在 \`narrativeStructure\` 中詳細寫出這四個階段的具體策略：
+                請將使用者的「腳本需求補充說明」與「流量密碼 (${trafficCodesStr})」深度融合，並將影片嚴格劃分為四個黃金階段。請在 \`narrativeStructure\` 中詳細寫出這四個階段的具體策略，並特別註明是如何應用所選的流量密碼：
                 - HOOK (開頭前 3-5 秒)：如何瞬間抓住眼球、製造痛點或強烈共鳴。
                 - 承接 (Development)：如何展開主題、帶入情境或主角困境。
                 - 轉折 (Turn)：如何製造懸念、提出核心知識點或顛覆性解決方案 (若是MV，此處為副歌視覺高潮)。
@@ -1782,6 +1831,8 @@
             try {
                 // 升級至 3.5 Flash 端點
                 const response = await window.callGeminiWithRetry(apiKey, payload);
+                response.trafficCodes = selectedTrafficCodes; // 將流量密碼存入歷史資料中
+                
                 window.saveToHistory(response); 
                 window.displayScript(response);
                 
@@ -1807,7 +1858,7 @@
         window.callGeminiWithRetry = async function(apiKey, payload, retries = 2) {
             for (let i = 0; i < retries; i++) {
                 try {
-                    const res = await fetch(`https://generativelanguage.googleapis.com/v1beta/models/gemini-3.5-flash:generateContent?key=${apiKey}`, {
+                    const res = await fetch(`https://generativelanguage.googleapis.com/v1beta/models/gemini-3.8-flash:generateContent?key=${apiKey}`, {
                         method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify(payload)
                     });
                     const data = await res.json();
@@ -1855,7 +1906,10 @@
                 </div></div>`;
             }
 
-            container.innerHTML = `<div class="bg-slate-800 text-white p-6 rounded-2xl shadow-inner relative overflow-hidden mb-6"><div class="flex items-center gap-2 mb-2 relative z-10"><span class="bg-slate-700 text-slate-300 text-xs px-2 py-0.5 rounded font-bold uppercase tracking-wider">${scriptStyle}</span><span class="bg-amber-500 text-amber-900 text-xs px-2 py-0.5 rounded font-bold uppercase tracking-wider">${selectedPlatform}</span></div><h2 class="text-2xl font-bold mb-2 relative z-10">${data.title || '未命名腳本'}</h2><p class="text-slate-300 text-sm leading-relaxed relative z-10">${data.summary || "專業競賽腳本已生成。"}</p><div class="absolute -right-8 -top-8 text-white/5"><i data-lucide="quote" class="w-32 h-32"></i></div></div>
+            const trafficCodesDisplay = (data.trafficCodes && data.trafficCodes.length > 0) ? data.trafficCodes.join(" / ") : "";
+            const trafficTagsHtml = trafficCodesDisplay ? `<span class="bg-rose-500 text-white text-xs px-2 py-0.5 rounded font-bold uppercase tracking-wider shadow-sm"><i data-lucide="zap" class="w-3 h-3 inline-block mr-1 mb-0.5"></i>${trafficCodesDisplay}</span>` : "";
+
+            container.innerHTML = `<div class="bg-slate-800 text-white p-6 rounded-2xl shadow-inner relative overflow-hidden mb-6"><div class="flex items-center gap-2 mb-2 relative z-10 flex-wrap"><span class="bg-slate-700 text-slate-300 text-xs px-2 py-0.5 rounded font-bold uppercase tracking-wider">${scriptStyle}</span><span class="bg-amber-500 text-amber-900 text-xs px-2 py-0.5 rounded font-bold uppercase tracking-wider">${selectedPlatform}</span>${trafficTagsHtml}</div><h2 class="text-2xl font-bold mb-2 relative z-10">${data.title || '未命名腳本'}</h2><p class="text-slate-300 text-sm leading-relaxed relative z-10">${data.summary || "專業競賽腳本已生成。"}</p><div class="absolute -right-8 -top-8 text-white/5"><i data-lucide="quote" class="w-32 h-32"></i></div></div>
                 ${sunoHTML}${narrativeHTML}${visualAssetsHTML}
                 <div class="space-y-6">
                     ${data.scenes.map(s => {
