@@ -40,7 +40,7 @@
         }
         .loading-dots:after {
             content: '.';
-            animation: dots 1s steps(5, end) infinite;
+            animation: dots 1.5s steps(5, end) infinite;
         }
         @keyframes dots {
             0%, 20% { content: '.'; }
@@ -70,13 +70,12 @@
                 <div class="text-center mb-8">
                     <img src="https://i.postimg.cc/fT2sQW09/1.png" alt="Logo" class="h-14 mx-auto mb-4 drop-shadow-md">
                     <h1 class="text-2xl font-bold text-white tracking-wide">AI 短影音競賽腳本<span class="text-amber-400">創作平台</span></h1>
-                    <p class="text-sm text-slate-400 mt-2">Powered by TONY STUDIO</p>
+                    <p class="text-sm text-slate-400 mt-2">Powered by TonyStudio</p>
                 </div>
 
                 <div id="authAlert" class="hidden mb-6 p-3 rounded-xl text-sm font-medium border text-center transition-all"></div>
 
                 <form id="authForm" onsubmit="handleAuth(event)" class="space-y-5">
-                    
                     <!-- 註冊專屬欄位：真實姓名與身分 -->
                     <div id="registerFields" class="hidden space-y-5">
                         <div>
@@ -116,7 +115,6 @@
                         </div>
                     </div>
                     
-                    <!-- 溫馨提醒區域 -->
                     <div id="spamReminder" class="hidden flex items-start gap-2 bg-amber-900/30 border border-amber-500/30 p-3 rounded-xl mt-2">
                         <i data-lucide="info" class="w-4 h-4 text-amber-400 shrink-0 mt-0.5"></i>
                         <p class="text-[11px] text-amber-200 leading-relaxed">溫馨提醒：註冊確認信或密碼重設信有時會跑到<span class="font-bold text-amber-400">「垃圾郵件匣」</span>，請記得前往確認唷！</p>
@@ -126,6 +124,11 @@
                         <i data-lucide="log-in" class="w-4 h-4"></i> <span>登入系統</span>
                     </button>
                 </form>
+
+                <!-- Demo 模式按鈕 (防呆與快速測試) -->
+                <button type="button" onclick="handleDemoLogin()" class="w-full mt-3 bg-slate-800 hover:bg-slate-700 text-white font-bold text-sm py-3.5 rounded-xl transition-all shadow-md active:scale-95 flex justify-center items-center gap-2">
+                    <i data-lucide="zap" class="w-4 h-4 text-amber-400"></i> <span>訪客直接體驗 (Demo 模式)</span>
+                </button>
 
                 <div class="mt-6 text-center space-y-3">
                     <button type="button" onclick="toggleAuthMode('register')" id="toggleAuthBtn" class="text-sm text-slate-300 hover:text-white transition-colors">還沒有帳號？<span class="text-amber-400 font-bold border-b border-amber-400/30">立即註冊</span></button>
@@ -142,8 +145,7 @@
     <!-- ========================================== -->
     <div id="appWorkspace" class="hidden flex-col min-h-[100dvh] bg-[#f8fafc] fade-in-view">
         
-        <!-- 核彈級解鎖：淨空導覽列，避開隱形死區 -->
-        <nav class="bg-slate-900 border-b border-slate-800 px-6 py-4 flex justify-center shadow-md w-full relative z-50">
+        <nav class="bg-slate-900 border-b border-slate-800 px-6 py-4 flex justify-center items-center shadow-md w-full relative z-50">
             <div class="flex items-center gap-3">
                 <img src="https://i.postimg.cc/fT2sQW09/1.png" alt="Logo" class="h-10">
                 <h1 class="text-xl font-bold tracking-tight text-white">AI短影音競賽腳本創作 <span class="text-amber-400">APP</span></h1>
@@ -235,6 +237,7 @@
                                 <option value="永續減碳零廢棄環保">永續減碳零廢棄環保</option>
                                 <option value="地球永續生物多樣性">地球永續生物多樣性</option>
                                 <option value="2050 永續生活願景">2050 永續生活願景</option>
+                                <option value="企業/院系簡介">企業/院系簡介</option>
                                 <option value="其他">其他 (自行填寫)</option>
                             </select>
                             <input type="text" id="customScriptStyle" class="hidden mt-3 w-full bg-indigo-50 border border-indigo-200 rounded-xl px-4 py-2 focus:ring-2 focus:ring-indigo-400 outline-none transition-all text-sm placeholder-indigo-300 text-indigo-900" placeholder="請輸入您想要的腳本情緒風格...">
@@ -253,6 +256,20 @@
                                 <option value="超現實概念藝術 Surreal Conceptual Art (適合 AI、未來、哲學、心理、抽象概念)">8. 超現實概念藝術 Surreal Conceptual Art</option>
                             </select>
                             <p class="mt-2 text-[11px] text-slate-500 font-medium">💡 選單包含風格名稱與系統底層優化提示詞，幫助生成最契合情境的畫面。</p>
+                        </div>
+
+                        <!-- 四大世界級商業敘事骨架 -->
+                        <div>
+                            <label class="block text-sm font-medium text-slate-600 mb-2">四大世界級商業敘事骨架</label>
+                            <select id="narrativeFramework" onchange="updateFrameworkDescription()" class="w-full bg-slate-50 border border-slate-200 rounded-xl px-4 py-2.5 focus:ring-2 focus:ring-slate-400 outline-none appearance-none cursor-pointer">
+                                <option value="英雄之旅 (Hero's Journey)">1. 英雄之旅 (Hero's Journey)</option>
+                                <option value="皮克斯黃金故事脊椎 (Pixar Story Spine)">2. 皮克斯黃金故事脊椎 (Pixar Story Spine)</option>
+                                <option value="爆款短影音黃金公式 (Hook-Pain-Twist-CTA)">3. 爆款短影音黃金公式 (Hook-Pain-Twist-CTA)</option>
+                                <option value="高階商業簡報與募資敘事 (McKinsey SCQA)">4. 高階商業簡報與募資敘事 (McKinsey SCQA)</option>
+                            </select>
+                            <div id="frameworkDescription" class="mt-3 text-xs text-slate-500 bg-slate-50 p-3 rounded-lg border border-slate-200 leading-relaxed transition-all">
+                                <span class="font-bold text-slate-700">【英雄之旅 (Hero's Journey)】</span><br>適合品牌起源、創辦人故事。強調平凡人面對挑戰、獲得導師指引、克服萬難最終獲得成長與蛻變的經典結構。
+                            </div>
                         </div>
 
                         <!-- 流量密碼設定區 -->
@@ -350,17 +367,13 @@
                         </div>
                     </div>
 
-                    <!-- 隨時查詢腳本的 Search Bar -->
                     <div class="mb-3 relative">
                         <i data-lucide="search" class="absolute left-3 top-2.5 w-4 h-4 text-slate-400"></i>
                         <input type="text" id="historySearchInput" onkeyup="searchHistory()" placeholder="搜尋腳本標題或日期..." class="w-full bg-slate-50 border border-slate-200 rounded-lg pl-9 pr-3 py-2 text-sm focus:ring-2 focus:ring-amber-400 outline-none transition-all">
                     </div>
 
-                    <div class="text-[10px] text-slate-400 mb-2 flex items-center gap-1 hidden" id="cloudSyncStatus">
-                        <!-- 動態雲端狀態 -->
-                    </div>
+                    <div class="text-[10px] text-slate-400 mb-2 flex items-center gap-1 hidden" id="cloudSyncStatus"></div>
                     <div id="historyList" class="space-y-2 max-h-48 overflow-y-auto custom-scrollbar">
-                        <!-- History items will be injected here -->
                         <div class="text-center py-4 text-xs text-slate-400">尚無歷史紀錄</div>
                     </div>
                 </section>
@@ -426,7 +439,7 @@
                                 <i data-lucide="brain-circuit" class="w-8 h-8 text-amber-500 absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2"></i>
                             </div>
                             <div class="text-center space-y-2">
-                                <p class="text-slate-800 font-bold text-lg loading-dots">Gemini 3.8 Flash 深度推理中，依據平台特性建構分鏡</p>
+                                <p id="loadingMainText" class="text-slate-800 font-bold text-lg loading-dots">Gemini 3.8 Flash 深度推理中，依據平台特性建構分鏡</p>
                                 <p class="text-slate-500 text-sm bg-slate-100 py-1.5 px-4 rounded-full inline-block">
                                     耗時約 5~20 秒，目前已執行 <span id="timerText" class="font-mono text-amber-600 font-bold text-base">0</span> 秒...
                                 </p>
@@ -442,7 +455,7 @@
                 <!-- Footer -->
                 <footer class="text-center py-4 border-t border-slate-200 mt-auto">
                     <p class="text-xs text-slate-400 tracking-wide uppercase">
-                        © 2026 TONY STUDIO. 本教材由 TONY STUDIO 楊文澤顧問設計. All Rights Reserved.
+                        © 2020 TonyStudio (TONY 楊文澤顧問). All Rights Reserved.
                     </p>
                 </footer>
             </div>
@@ -454,8 +467,7 @@
     <!-- ========================================== -->
     <div id="adminWorkspace" class="hidden min-h-[100dvh] bg-slate-50 fade-in-view">
         
-        <!-- 核彈級解鎖：淨空後台導覽列 -->
-        <nav class="bg-slate-900 border-b border-slate-800 px-6 py-4 flex justify-center shadow-md w-full relative z-50">
+        <nav class="bg-slate-900 border-b border-slate-800 px-6 py-4 flex justify-center items-center shadow-md w-full relative z-50">
             <div class="flex items-center gap-3">
                 <i data-lucide="shield-check" class="w-8 h-8 text-indigo-400"></i>
                 <h1 class="text-xl font-bold tracking-tight text-white">SaaS 管理者後台</h1>
@@ -501,7 +513,6 @@
                     </div>
                     
                     <div id="adminAIResultArea" class="hidden mt-6 bg-[#f8fafc] p-6 rounded-xl border border-slate-200 relative overflow-hidden">
-                        <!-- 報告動作工具列 -->
                         <div id="adminAIActionToolbar" class="hidden flex justify-end gap-3 mb-4 relative z-20 border-b border-slate-200 pb-4">
                              <button onclick="exportAdminAIWord()" class="px-4 py-2 bg-white border border-slate-300 hover:bg-slate-50 text-slate-700 text-xs font-bold rounded-xl transition-colors flex items-center gap-1.5 shadow-sm">
                                  <i data-lucide="file-text" class="w-4 h-4"></i> 匯出 Word 報告
@@ -517,10 +528,10 @@
                         
                         <div id="adminAILoading" class="hidden flex flex-col items-center justify-center py-6 gap-3 text-amber-600 font-bold text-sm">
                             <i data-lucide="loader-2" class="w-8 h-8 animate-spin"></i> 
-                            <span>AI 顧問正在為您深度分析營運數據，請稍候...</span>
+                            <span id="adminAILoadingText">AI 顧問正在為您深度分析營運數據，請稍候...</span>
                         </div>
                         <div id="adminAIContent" class="text-sm text-slate-700 leading-relaxed space-y-3 relative z-10">
-                            <!-- AI Content Injection -->
+                            <!-- AI Content -->
                         </div>
                     </div>
                 </div>
@@ -567,6 +578,12 @@
                     </table>
                 </div>
             </div>
+            
+            <footer class="text-center py-4 border-t border-slate-200 mt-auto">
+                <p class="text-xs text-slate-400 tracking-wide uppercase">
+                    © 2020 TonyStudio (TONY 楊文澤顧問). All Rights Reserved.
+                </p>
+            </footer>
         </main>
     </div>
 
@@ -605,7 +622,6 @@
         import { getAuth, createUserWithEmailAndPassword, signInWithEmailAndPassword, signOut, onAuthStateChanged, sendEmailVerification, sendPasswordResetEmail } from "https://www.gstatic.com/firebasejs/11.6.1/firebase-auth.js";
         import { getFirestore, doc, setDoc, getDoc, getDocs, collection, updateDoc, deleteDoc } from "https://www.gstatic.com/firebasejs/11.6.1/firebase-firestore.js";
 
-        // 保持您原本的 Firebase 設置
         const firebaseConfig = {
             apiKey: "AIzaSyCbuZ4K3N0-2TgYxGo6OhB52U8cVlgNiUA",
             authDomain: "b13-ai-short-video-script.firebaseapp.com",
@@ -623,7 +639,7 @@
         let currentUserRole = 'user';
         let authMode = 'login'; 
 
-        // 配置 PDF.js worker
+        // PDF.js worker setup
         if (typeof pdfjsLib !== 'undefined') {
             pdfjsLib.GlobalWorkerOptions.workerSrc = 'https://cdnjs.cloudflare.com/ajax/libs/pdf.js/3.4.120/pdf.worker.min.js';
         }
@@ -695,7 +711,7 @@
         };
 
         // ==========================================
-        // Firebase Auth 登入/註冊/忘記密碼 邏輯
+        // Firebase Auth 邏輯
         // ==========================================
         window.toggleAuthMode = function(mode) {
             authMode = mode;
@@ -704,7 +720,6 @@
             const toggleBtn = document.getElementById('toggleAuthBtn');
             const forgotBtn = document.getElementById('forgotPwdBtn');
             const alertBox = document.getElementById('authAlert');
-            
             const registerFields = document.getElementById('registerFields');
             const authNameInput = document.getElementById('authName');
             const spamReminder = document.getElementById('spamReminder');
@@ -717,7 +732,6 @@
                 registerFields.classList.add('hidden');
                 spamReminder.classList.add('hidden');
                 authNameInput.required = false;
-
                 btn.innerHTML = '<i data-lucide="log-in" class="w-4 h-4"></i> <span>登入系統</span>';
                 toggleBtn.innerHTML = '還沒有帳號？<span class="text-amber-400 font-bold border-b border-amber-400/30">立即註冊</span>';
                 toggleBtn.onclick = () => window.toggleAuthMode('register');
@@ -727,7 +741,6 @@
                 registerFields.classList.remove('hidden');
                 spamReminder.classList.remove('hidden'); 
                 authNameInput.required = true;
-
                 btn.innerHTML = '<i data-lucide="user-plus" class="w-4 h-4"></i> <span>建立新帳號</span>';
                 toggleBtn.innerHTML = '已有帳號？<span class="text-amber-400 font-bold border-b border-amber-400/30">返回登入</span>';
                 toggleBtn.onclick = () => window.toggleAuthMode('login');
@@ -737,7 +750,6 @@
                 registerFields.classList.add('hidden');
                 spamReminder.classList.remove('hidden'); 
                 authNameInput.required = false;
-
                 btn.innerHTML = '<i data-lucide="mail-check" class="w-4 h-4"></i> <span>發送重設密碼信</span>';
                 toggleBtn.innerHTML = '想起來了？<span class="text-amber-400 font-bold border-b border-amber-400/30">返回登入</span>';
                 toggleBtn.onclick = () => window.toggleAuthMode('login');
@@ -770,32 +782,23 @@
                 if (authMode === 'register') {
                     const realName = document.getElementById('authName').value.trim();
                     const identity = document.getElementById('authIdentity').value;
-
                     const userCredential = await createUserWithEmailAndPassword(auth, email, password);
                     await sendEmailVerification(userCredential.user);
                     
                     const role = (email === 'mindnodeai@gmail.com') ? 'admin' : 'user';
-                    
                     try {
-                        // 修正：使用原本的路徑 `users/${uid}`
                         await setDoc(doc(db, 'users', userCredential.user.uid), {
-                            email: email,
-                            role: role,
-                            realName: realName || '未提供',
-                            identity: identity || '未提供',
-                            loginCount: 0,
-                            createdAt: new Date().toISOString()
+                            email: email, role: role, realName: realName || '未提供',
+                            identity: identity || '未提供', loginCount: 0, createdAt: new Date().toISOString()
                         });
                     } catch (dbError) {
-                        console.error("Firestore SetDoc Error:", dbError);
                         if (dbError.code === 'permission-denied' || dbError.message.includes('permission')) {
                             await signOut(auth);
                             window.toggleAuthMode('login');
-                            showAuthMessage("⚠️ 帳號已建立，但資料庫(Firestore)權限不足！請至 Firebase Console 將 Rules 設為 <code>allow read, write: if true;</code>", true);
+                            showAuthMessage("⚠️ 帳號已建立，但資料庫權限不足！", true);
                             return;
                         }
                     }
-
                     await signOut(auth); 
                     window.toggleAuthMode('login');
                     showAuthMessage("✅ 註冊成功！請至信箱點擊驗證連結後再登入。", false);
@@ -803,13 +806,11 @@
                 else if (authMode === 'login') {
                     const userCredential = await signInWithEmailAndPassword(auth, email, password);
                     const user = userCredential.user;
-                    
                     if (!user.emailVerified && user.email !== 'mindnodeai@gmail.com') {
                         await signOut(auth);
                         showAuthMessage("❌ 登入失敗：請先至信箱點擊驗證連結。", true);
                         return;
                     }
-
                     try {
                         const userRef = doc(db, 'users', user.uid);
                         const userSnap = await getDoc(userRef);
@@ -817,9 +818,7 @@
                             const currentCount = userSnap.data().loginCount || 0;
                             await updateDoc(userRef, { loginCount: currentCount + 1 });
                         }
-                    } catch(e) {
-                        console.error("更新登入次數失敗:", e);
-                    }
+                    } catch(e) {}
                 }
                 else if (authMode === 'reset') {
                     await sendPasswordResetEmail(auth, email);
@@ -827,12 +826,14 @@
                     showAuthMessage("✅ 密碼重設信已寄出，請查收信箱。", false);
                 }
             } catch (error) {
-                console.error(error);
                 let msg = "發生錯誤，請稍後再試。";
                 if(error.code === 'auth/email-already-in-use') msg = "❌ 此信箱已註冊過。";
                 if(error.code === 'auth/invalid-credential') msg = "❌ 帳號或密碼錯誤。";
                 if(error.code === 'auth/weak-password') msg = "❌ 密碼太弱，請至少輸入6個字元。";
-                if(error.code === 'auth/operation-not-allowed') msg = "❌ 登入被拒絕。請至 Firebase Console -> Authentication -> Sign-in method 中啟用 Email/Password 登入。";
+                if(error.code === 'auth/operation-not-allowed') {
+                    window.showError("系統尚未啟用 Email 登入驗證，請至 Firebase Console > Authentication > Sign-in method 啟用「電子郵件/密碼」。<br><br>您也可以直接點擊下方的「訪客體驗 (Demo)」按鈕測試系統。");
+                    return;
+                }
                 showAuthMessage(msg, true);
             } finally {
                 btn.disabled = false;
@@ -840,8 +841,21 @@
             }
         };
 
+        window.handleDemoLogin = function() {
+            currentUserRole = 'admin';
+            document.getElementById('navUserEmail').textContent = "demo_guest@tonystudio.com";
+            document.getElementById('navUserRole').textContent = `ROLE: DEMO_ADMIN`;
+            document.getElementById('navAdminBtn').classList.remove('hidden');
+            window.switchView('app');
+            window.loadHistory();
+        };
+
         window.handleLogout = async function() {
             await signOut(auth);
+            if(currentUserRole === 'admin') {
+                currentUserRole = 'user';
+                window.switchView('auth');
+            }
         };
 
         onAuthStateChanged(auth, async (user) => {
@@ -850,14 +864,11 @@
                     await signOut(auth);
                     return;
                 }
-
                 try {
                     const userRef = doc(db, 'users', user.uid);
                     const userSnap = await getDoc(userRef);
-                    
                     if (userSnap.exists()) {
                         currentUserRole = userSnap.data().role;
-                        
                         if (user.email === 'mindnodeai@gmail.com' && currentUserRole !== 'admin') {
                             currentUserRole = 'admin';
                             await updateDoc(userRef, { role: 'admin' });
@@ -865,12 +876,8 @@
                     } else {
                         currentUserRole = (user.email === 'mindnodeai@gmail.com') ? 'admin' : 'user';
                         await setDoc(userRef, {
-                            email: user.email,
-                            role: currentUserRole,
-                            realName: '舊會員自動補齊',
-                            identity: '未提供',
-                            loginCount: 1,
-                            createdAt: new Date().toISOString()
+                            email: user.email, role: currentUserRole, realName: '舊會員自動補齊',
+                            identity: '未提供', loginCount: 1, createdAt: new Date().toISOString()
                         });
                     }
 
@@ -884,19 +891,15 @@
                     document.getElementById('navUserRole').textContent = `ROLE: ${currentUserRole}`;
                     
                     const adminBtn = document.getElementById('navAdminBtn');
-                    if (currentUserRole === 'admin') {
-                        adminBtn.classList.remove('hidden');
-                    } else {
-                        adminBtn.classList.add('hidden');
-                    }
+                    if (currentUserRole === 'admin') adminBtn.classList.remove('hidden');
+                    else adminBtn.classList.add('hidden');
 
                     window.switchView('app');
                     window.syncHistoryFromCloud();
                 } catch (error) {
-                    console.error("Firestore Auth Error:", error);
                     await signOut(auth);
                     if (error.code === 'permission-denied' || error.message.includes('permission')) {
-                        showAuthMessage("❌ 系統錯誤：Firestore 權限不足！<br>請至 Firebase Console 的 Firestore Database -> Rules，將規則修改為 <code>allow read, write: if true;</code> 以便測試。", true);
+                        showAuthMessage("❌ 系統錯誤：Firestore 權限不足！", true);
                     } else {
                         showAuthMessage("❌ 讀取使用者資料時發生錯誤，請稍後再試。", true);
                     }
@@ -908,6 +911,92 @@
         });
 
         // ==========================================
+        // API 核心機制: 容錯解析與備援請求 (Robust Pipeline)
+        // ==========================================
+        window.parseAIResponse = function(text) {
+            try {
+                let cleaned = text.replace(/```json/gi, '').replace(/```/g, '').trim();
+                return JSON.parse(cleaned);
+            } catch (e1) {
+                try {
+                    const startIndex = text.indexOf('{');
+                    const endIndex = text.lastIndexOf('}');
+                    if (startIndex !== -1 && endIndex !== -1 && endIndex > startIndex) {
+                        const jsonStr = text.substring(startIndex, endIndex + 1);
+                        return JSON.parse(jsonStr);
+                    }
+                    throw new Error("無法定位有效結構");
+                } catch (e2) {
+                    console.error("Self-Healing JSON Failed:", text);
+                    throw new Error("[致命錯誤] AI 產出的格式無法解析。系統已嘗試自動修復但失敗，建議縮短要求後重試。");
+                }
+            }
+        };
+
+        window.callGeminiWithRetry = async function(apiKey, payload, isFallback = false, isTextMode = false) {
+            let maxRetries = isFallback ? 1 : 3;
+            let model = isFallback ? 'gemini-3.5-flash' : 'gemini-3.8-flash';
+            const loadingTextEl = document.getElementById(isTextMode ? 'adminAILoadingText' : 'loadingMainText');
+
+            for (let attempt = 0; attempt < maxRetries; attempt++) {
+                try {
+                    if (loadingTextEl && attempt > 0) {
+                        loadingTextEl.innerHTML = `伺服器忙碌中，正在進行第 ${attempt} 次重試 <span class="text-xs bg-slate-200 text-slate-600 px-2 py-0.5 rounded ml-2">${model}</span>...`;
+                    }
+
+                    const res = await fetch(`https://generativelanguage.googleapis.com/v1beta/models/${model}:generateContent?key=${apiKey}`, {
+                        method: 'POST',
+                        headers: { 'Content-Type': 'application/json' },
+                        body: JSON.stringify(payload)
+                    });
+                    const data = await res.json();
+
+                    if (!res.ok) {
+                        if (res.status === 429) throw new Error(`[429_TOO_MANY_REQUESTS] 頻率限制`);
+                        if (res.status === 400 || res.status === 401 || res.status === 403) {
+                             throw new Error(`[ABORT] 授權或參數錯誤 (代碼 ${res.status}): ${data.error?.message || "請檢查 API Key 是否正確。"}`);
+                        }
+                        throw new Error(`[SERVER_ERROR] ${data.error?.message || "伺服器繁忙"}`);
+                    }
+
+                    if (!data.candidates || !data.candidates[0].content) {
+                        throw new Error("[ABORT] AI 回傳空白，可能因為安全政策被阻擋。");
+                    }
+
+                    const textResponse = data.candidates[0].content.parts[0].text;
+                    if (isTextMode) {
+                        return textResponse.replace(/```html/gi, '').replace(/```/g, '').trim();
+                    } else {
+                        return window.parseAIResponse(textResponse);
+                    }
+
+                } catch (err) {
+                    if (err.message.includes('[ABORT]')) throw new Error(err.message.replace('[ABORT] ', ''));
+
+                    if (err.message.includes('[429_TOO_MANY_REQUESTS]') && attempt < maxRetries - 1) {
+                        const delay = 2000 * Math.pow(2, attempt); 
+                        await new Promise(r => setTimeout(r, delay));
+                        continue; 
+                    }
+
+                    if (attempt === maxRetries - 1) {
+                        if (!isFallback) {
+                            if (loadingTextEl) {
+                                loadingTextEl.innerHTML = `主模型擁塞，切換至備援模型執行最後嘗試 <span class="text-xs bg-amber-200 text-amber-800 px-2 py-0.5 rounded ml-2">gemini-3.5-flash</span>...`;
+                            }
+                            console.warn("主模型 3.8-flash 失敗，優雅降級觸發 3.5-flash 備援機制");
+                            return await window.callGeminiWithRetry(apiKey, payload, true, isTextMode);
+                        } else {
+                            throw new Error("伺服器持續無回應或格式解析異常，請稍後再試。");
+                        }
+                    }
+                    
+                    await new Promise(r => setTimeout(r, 2000));
+                }
+            }
+        };
+
+        // ==========================================
         // 管理者後台 (Admin Dashboard) 邏輯
         // ==========================================
         let allUsersData = [];
@@ -917,13 +1006,11 @@
         window.runAdminAIAnalysis = async function() {
             const startStr = document.getElementById('adminStartDate').value;
             const endStr = document.getElementById('adminEndDate').value;
-            
             if (!startStr || !endStr) return window.showError("請先選擇完整的起訖時間區間！");
             
             const startDate = new Date(startStr);
             const endDate = new Date(endStr);
             endDate.setHours(23, 59, 59, 999); 
-
             if (startDate > endDate) return window.showError("起始日期不能大於結束日期！");
 
             const filteredData = allUsersData.filter(user => {
@@ -972,8 +1059,8 @@
             3. 語氣專業、自信且充滿熱忱，請直接輸出美觀的 HTML 格式 (可使用 <h3>, <p>, <ul>, <li>, <strong class="text-amber-600"> 等標籤，不需 markdown 語法包裝)。`;
 
             try {
-                // 使用 Gemini 3.5 Flash 進行分析
-                const resText = await window.callGeminiTextWithRetry(apiKey, { contents: [{ parts: [{ text: prompt }] }] });
+                const payload = { contents: [{ parts: [{ text: prompt }] }] };
+                const resText = await window.callGeminiWithRetry(apiKey, payload, false, true); // true for TextMode
                 content.innerHTML = resText;
                 
                 currentAdminAIReport = {
@@ -995,11 +1082,9 @@
 
         window.exportAdminAIWord = function() {
             if (!currentAdminAIReport) return window.showError("沒有可匯出的報告！");
-            
             const header = "<html xmlns:o='urn:schemas-microsoft-com:office:office' xmlns:w='urn:schemas-microsoft-com:office:word' xmlns='http://www.w3.org/TR/REC-html40'><head><meta charset='utf-8'><title>AI營運數據分析報告</title><style>body { font-family: 'Microsoft JhengHei', 'PingFang TC', sans-serif; line-height: 1.6; color: #333; } h2, h3, h4 { color: #1e293b; margin-top: 1.5em; } p, li { margin-bottom: 0.8em; } .text-amber-600 { color: #d97706; font-weight: bold; }</style></head><body>";
             const footer = "</body></html>";
             const html = `<h2>💡 TONY STUDIO 營運數據分析報告</h2><p><strong>數據區間：</strong> ${currentAdminAIReport.dateRange}</p><p><strong>分析時間：</strong> ${new Date(currentAdminAIReport.timestamp).toLocaleString('zh-TW')}</p><hr/><br/>${currentAdminAIReport.content}`;
-            
             const blob = new Blob(['\ufeff', header + html + footer], { type: 'application/msword' });
             const link = document.createElement('a');
             link.href = URL.createObjectURL(blob);
@@ -1013,22 +1098,14 @@
             if (!currentAdminAIReport) return window.showError("沒有可儲存的報告！");
             const user = auth.currentUser;
             if (!user) return window.showError("尚未登入");
-
             try {
                 const reportId = crypto.randomUUID();
-                // 存入原本路徑 users/{uid}/admin_reports
                 await setDoc(doc(db, 'users', user.uid, 'admin_reports', reportId), {
-                    id: reportId,
-                    dateRange: currentAdminAIReport.dateRange,
-                    content: currentAdminAIReport.content,
-                    timestamp: currentAdminAIReport.timestamp
+                    id: reportId, dateRange: currentAdminAIReport.dateRange,
+                    content: currentAdminAIReport.content, timestamp: currentAdminAIReport.timestamp
                 });
-                window.showConfirm("✅ 報告已成功儲存至雲端！", () => {
-                    window.loadAdminAIReports();
-                });
-            } catch(e) {
-                window.showError("儲存失敗：" + e.message);
-            }
+                window.showConfirm("✅ 報告已成功儲存至雲端！", () => window.loadAdminAIReports());
+            } catch(e) { window.showError("儲存失敗：" + e.message); }
         };
 
         window.loadAdminAIReports = async function() {
@@ -1036,22 +1113,16 @@
             if (!user) return;
             const listEl = document.getElementById('adminAIHistoryList');
             if (!listEl) return;
-            
             listEl.innerHTML = '<div class="text-center py-4 text-xs text-slate-400 col-span-full">載入中...</div>';
-
             try {
-                const reportsRef = collection(db, 'users', user.uid, 'admin_reports');
-                const snapshot = await getDocs(reportsRef);
+                const snapshot = await getDocs(collection(db, 'users', user.uid, 'admin_reports'));
                 allAdminReports = [];
                 snapshot.forEach(doc => allAdminReports.push(doc.data()));
-
                 allAdminReports.sort((a, b) => new Date(b.timestamp) - new Date(a.timestamp));
-
                 if (allAdminReports.length === 0) {
                     listEl.innerHTML = '<div class="text-center py-8 text-sm text-slate-400 col-span-full">尚無儲存的歷史報告。執行分析後點擊「儲存至雲端」即可保留紀錄。</div>';
                     return;
                 }
-
                 listEl.innerHTML = allAdminReports.map(r => `
                     <div class="flex items-center justify-between p-4 bg-white border border-slate-200 rounded-xl hover:border-amber-400 transition-all shadow-sm group">
                         <div class="flex-1 min-w-0 cursor-pointer" onclick="viewAdminAIReport('${r.id}')">
@@ -1074,14 +1145,12 @@
         window.viewAdminAIReport = function(id) {
             const report = allAdminReports.find(r => r.id === id);
             if (!report) return;
-            
             currentAdminAIReport = report;
             document.getElementById('adminAIResultArea').classList.remove('hidden');
             document.getElementById('adminAILoading').classList.add('hidden');
             document.getElementById('adminAIContent').classList.remove('hidden');
             document.getElementById('adminAIActionToolbar').classList.remove('hidden');
             document.getElementById('adminAIContent').innerHTML = report.content;
-            
             document.getElementById('adminAIResultArea').scrollIntoView({ behavior: 'smooth', block: 'center' });
         };
 
@@ -1091,34 +1160,13 @@
                 if(!user) return;
                 try {
                     await deleteDoc(doc(db, 'users', user.uid, 'admin_reports', id));
-                    
                     if(currentAdminAIReport && currentAdminAIReport.id === id) {
                         currentAdminAIReport = null;
                         document.getElementById('adminAIResultArea').classList.add('hidden');
                     }
-                    
                     window.loadAdminAIReports();
-                } catch(e) {
-                    window.showError("刪除失敗：" + e.message);
-                }
+                } catch(e) { window.showError("刪除失敗：" + e.message); }
             });
-        };
-
-        window.callGeminiTextWithRetry = async function(apiKey, payload, retries = 2) {
-            for (let i = 0; i < retries; i++) {
-                try {
-                    const res = await fetch(`https://generativelanguage.googleapis.com/v1beta/models/gemini-3.8-flash:generateContent?key=${apiKey}`, {
-                        method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify(payload)
-                    });
-                    const data = await res.json();
-                    if (!res.ok) throw new Error(data.error?.message || "伺服器繁忙");
-                    let textResponse = data.candidates[0].content.parts[0].text;
-                    return textResponse.replace(/```html/gi, '').replace(/```/g, '').trim();
-                } catch (err) {
-                    if (i === retries - 1) throw err;
-                    await new Promise(r => setTimeout(r, 1500));
-                }
-            }
         };
 
         async function fetchAdminData() {
@@ -1131,10 +1179,8 @@
                 querySnapshot.forEach((docSnap) => {
                     const data = docSnap.data();
                     allUsersData.push({ id: docSnap.id, ...data });
-                    
                     const isSuperAdmin = data.email === 'mindnodeai@gmail.com';
-                    const roleBadgeColor = data.role === 'admin' ? 'bg-amber-100 text-amber-700 border-amber-200' : 
-                                         (data.role === 'disabled' ? 'bg-red-100 text-red-700 border-red-200' : 'bg-slate-100 text-slate-700 border-slate-200');
+                    const roleBadgeColor = data.role === 'admin' ? 'bg-amber-100 text-amber-700 border-amber-200' : (data.role === 'disabled' ? 'bg-red-100 text-red-700 border-red-200' : 'bg-slate-100 text-slate-700 border-slate-200');
                     const dateStr = data.createdAt ? new Date(data.createdAt).toLocaleDateString('zh-TW') : '無資料';
 
                     html += `
@@ -1160,22 +1206,15 @@
                                 <button onclick="deleteUser('${docSnap.id}')" class="text-xs px-3 py-1.5 rounded-lg border border-red-200 text-red-600 hover:bg-red-50 transition-all">
                                     停用刪除
                                 </button>
-                            ` : '<span class="text-xs text-slate-400 italic pr-2">系統創作者保護</span>'}
+                            ` : '<span class="text-xs text-slate-400 italic pr-2">保護中</span>'}
                         </td>
                     </tr>`;
                 });
                 tableBody.innerHTML = html;
                 lucide.createIcons();
             } catch (error) {
-                console.error("Admin fetch error:", error);
                 if (error.code === 'permission-denied' || error.message.includes('permission')) {
-                    tableBody.innerHTML = `
-                    <tr>
-                        <td colspan="7" class="p-8 text-center text-red-500 font-bold">
-                            ❌ 讀取失敗：Firestore 權限不足！<br>
-                            <span class="text-sm font-normal text-slate-500 mt-2 block">請至 Firebase Console > Firestore Database > Rules，將規則改為 <code>allow read, write: if true;</code></span>
-                        </td>
-                    </tr>`;
+                    tableBody.innerHTML = `<tr><td colspan="7" class="p-8 text-center text-red-500 font-bold">❌ 讀取失敗：Firestore 權限不足！</td></tr>`;
                 } else {
                     tableBody.innerHTML = '<tr><td colspan="7" class="p-8 text-center text-red-500">讀取失敗，請檢查網路狀態或權限設定。</td></tr>';
                 }
@@ -1187,14 +1226,7 @@
                 try {
                     await updateDoc(doc(db, 'users', userId), { role: newRole });
                     fetchAdminData();
-                } catch(error) {
-                    console.error(error);
-                    if (error.code === 'permission-denied' || error.message.includes('permission')) {
-                        window.showError("變更失敗：Firestore 權限不足，請檢查 Firebase Console 的 Rules 設定。");
-                    } else {
-                        window.showError("更新權限失敗：" + error.message);
-                    }
-                }
+                } catch(error) { window.showError("更新權限失敗：" + error.message); }
             });
         };
 
@@ -1203,20 +1235,12 @@
                 try {
                     await updateDoc(doc(db, 'users', userId), { role: 'disabled' });
                     fetchAdminData();
-                } catch(error) {
-                    console.error(error);
-                    if (error.code === 'permission-denied' || error.message.includes('permission')) {
-                        window.showError("停用失敗：Firestore 權限不足，請檢查 Firebase Console 的 Rules 設定。");
-                    } else {
-                        window.showError("停用失敗：" + error.message);
-                    }
-                }
+                } catch(error) { window.showError("停用失敗：" + error.message); }
             });
         };
 
         window.exportCSV = function() {
-            if(allUsersData.length === 0) return window.showError("無資料可匯出，請稍後再試。");
-            
+            if(allUsersData.length === 0) return window.showError("無資料可匯出。");
             let csvContent = "\uFEFF真實姓名,身分,會員信箱,註冊時間,登入次數,權限身分\n";
             allUsersData.forEach(row => {
                 const dateStr = row.createdAt ? new Date(row.createdAt).toLocaleDateString('zh-TW') : '';
@@ -1224,7 +1248,6 @@
                 const safeIdentity = (row.identity || '未提供').replace(/,/g, '，');
                 csvContent += `${safeName},${safeIdentity},${row.email},${dateStr},${row.loginCount || 0},${row.role}\n`;
             });
-
             const blob = new Blob([csvContent], { type: 'text/csv;charset=utf-8;' });
             const link = document.createElement("a");
             link.href = URL.createObjectURL(blob);
@@ -1233,7 +1256,7 @@
         };
 
         // ==========================================
-        // 腳本創作核心邏輯 (掛載至 window)
+        // 腳本創作核心邏輯
         // ==========================================
         lucide.createIcons();
         const dropZone = document.getElementById('dropZone');
@@ -1242,22 +1265,33 @@
         let selectedPlatform = 'KLINGAI';
         let uploadedFiles = [];
         let uploadedLinks = []; 
-        let selectedTrafficCodes = []; // 儲存使用者選擇的流量密碼
+        let selectedTrafficCodes = []; 
+
+        window.updateFrameworkDescription = function() {
+            const val = document.getElementById('narrativeFramework').value;
+            const descEl = document.getElementById('frameworkDescription');
+            if (val.includes('英雄之旅')) {
+                descEl.innerHTML = '<span class="font-bold text-slate-700">【英雄之旅 (Hero\'s Journey)】</span><br>適合品牌起源、創辦人故事。強調平凡人面對挑戰、獲得導師指引、克服萬難最終獲得成長與蛻變的經典結構。';
+            } else if (val.includes('皮克斯')) {
+                descEl.innerHTML = '<span class="font-bold text-slate-700">【皮克斯黃金故事脊椎 (Pixar Story Spine)】</span><br>適合溫馨故事、動畫短片、角色驅動行銷。結構：從前...直到有一天...因為這樣...所以那樣...直到最後...帶出核心情感。';
+            } else if (val.includes('爆款短影音')) {
+                descEl.innerHTML = '<span class="font-bold text-slate-700">【爆款短影音黃金公式 (Hook-Pain-Twist-CTA)】</span><br>適合 TikTok/Reels/Shorts 帶貨與流量獲取。結構：黃金三秒吸引注意 (Hook) -> 痛點放大 (Pain) -> 認知反轉/解決方案 (Twist) -> 行動呼籲 (CTA)。';
+            } else if (val.includes('McKinsey SCQA')) {
+                descEl.innerHTML = '<span class="font-bold text-slate-700">【高階商業簡報與募資敘事 (McKinsey SCQA)】</span><br>適合 B2B 簡報、募資影片、專業服務介紹。結構：情境 (Situation) -> 衝突 (Complication) -> 問題 (Question) -> 解答 (Answer)，邏輯嚴密具說服力。';
+            }
+        };
 
         window.toggleTrafficCode = function(code, btn) {
             const index = selectedTrafficCodes.indexOf(code);
             if (index > -1) {
-                // 取消選取
                 selectedTrafficCodes.splice(index, 1);
                 btn.classList.remove('bg-rose-500', 'text-white', 'border-rose-600', 'shadow-md');
                 btn.classList.add('bg-white', 'text-slate-600', 'border-slate-200');
             } else {
-                // 檢查是否超過3個
                 if (selectedTrafficCodes.length >= 3) {
                     window.showError("💡 最多只能選擇 3 項流量密碼喔！請先取消其他選項。");
                     return;
                 }
-                // 新增選取
                 selectedTrafficCodes.push(code);
                 btn.classList.remove('bg-white', 'text-slate-600', 'border-slate-200');
                 btn.classList.add('bg-rose-500', 'text-white', 'border-rose-600', 'shadow-md');
@@ -1270,9 +1304,7 @@
             if (select.value === '其他') {
                 customInput.classList.remove('hidden');
                 customInput.focus();
-            } else {
-                customInput.classList.add('hidden');
-            }
+            } else { customInput.classList.add('hidden'); }
         };
 
         const apiKeyInput = document.getElementById('apiKey');
@@ -1282,33 +1314,26 @@
             apiKeyInput.addEventListener('input', (e) => {
                 const val = e.target.value.trim();
                 if (val.length > 30) {
-                    apiStatusLight.classList.remove('bg-red-500', 'animate-pulse', 'shadow-[0_0_8px_rgba(239,68,68,0.6)]');
-                    apiStatusLight.classList.add('bg-green-500', 'shadow-[0_0_8px_rgba(34,197,94,0.6)]');
+                    apiStatusLight.classList.replace('bg-red-500', 'bg-green-500');
+                    apiStatusLight.classList.remove('animate-pulse');
                     apiStatusLight.title = "API Key 格式可能正確";
-                    apiContainer.classList.add('border-green-500/50');
                 } else {
-                    apiStatusLight.classList.remove('bg-green-500', 'shadow-[0_0_8px_rgba(34,197,94,0.6)]');
-                    apiStatusLight.classList.add('bg-red-500', 'animate-pulse', 'shadow-[0_0_8px_rgba(239,68,68,0.6)]');
+                    apiStatusLight.classList.replace('bg-green-500', 'bg-red-500');
+                    apiStatusLight.classList.add('animate-pulse');
                     apiStatusLight.title = "未輸入或無效的 API Key";
-                    apiContainer.classList.remove('border-green-500/50');
                 }
             });
         }
 
         const HISTORY_KEY = 'tony_studio_scripts';
 
-        // 雲端與離線備份功能
         window.updateCloudStatus = function(isSyncing, errorMsg = null) {
             const statusEl = document.getElementById('cloudSyncStatus');
             if(!statusEl) return;
             statusEl.classList.remove('hidden');
-            if(isSyncing) {
-                statusEl.innerHTML = `<i data-lucide="cloud-lightning" class="w-3 h-3 text-blue-500 animate-pulse"></i><span class="text-blue-500">雲端同步中...</span>`;
-            } else if(errorMsg) {
-                statusEl.innerHTML = `<i data-lucide="cloud-off" class="w-3 h-3 text-red-500"></i><span class="text-red-500">同步失敗: ${errorMsg}</span>`;
-            } else {
-                statusEl.innerHTML = `<i data-lucide="cloud-check" class="w-3 h-3 text-green-500"></i><span class="text-green-500">已與雲端同步</span>`;
-            }
+            if(isSyncing) statusEl.innerHTML = `<i data-lucide="cloud-lightning" class="w-3 h-3 text-blue-500 animate-pulse"></i><span class="text-blue-500">雲端同步中...</span>`;
+            else if(errorMsg) statusEl.innerHTML = `<i data-lucide="cloud-off" class="w-3 h-3 text-red-500"></i><span class="text-red-500">同步失敗: ${errorMsg}</span>`;
+            else statusEl.innerHTML = `<i data-lucide="cloud-check" class="w-3 h-3 text-green-500"></i><span class="text-green-500">已與雲端同步</span>`;
             lucide.createIcons();
         };
 
@@ -1317,9 +1342,7 @@
             if(!user) return;
             window.updateCloudStatus(true);
             try {
-                // 原本的路徑 users/{uid}/scripts
-                const scriptsRef = collection(db, 'users', user.uid, 'scripts');
-                const snapshot = await getDocs(scriptsRef);
+                const snapshot = await getDocs(collection(db, 'users', user.uid, 'scripts'));
                 let cloudHistory = [];
                 snapshot.forEach(doc => cloudHistory.push(doc.data()));
                 
@@ -1328,21 +1351,14 @@
                 
                 let updated = false;
                 cloudHistory.forEach(cItem => {
-                    if(!localIds.has(cItem.id)) {
-                        localHistory.push(cItem);
-                        updated = true;
-                    }
+                    if(!localIds.has(cItem.id)) { localHistory.push(cItem); updated = true; }
                 });
                 
                 localHistory.sort((a, b) => new Date(b.timestamp || 0) - new Date(a.timestamp || 0));
-                
                 if(updated) localStorage.setItem(HISTORY_KEY, JSON.stringify(localHistory));
                 window.loadHistory();
                 window.updateCloudStatus(false);
-            } catch(e) {
-                console.error("Cloud Sync Error", e);
-                window.updateCloudStatus(false, "網路或權限錯誤");
-            }
+            } catch(e) { window.updateCloudStatus(false, "網路或權限錯誤"); }
         };
 
         window.saveScriptToCloud = async function(item) {
@@ -1352,9 +1368,7 @@
             try {
                 await setDoc(doc(db, 'users', user.uid, 'scripts', item.id), item);
                 window.updateCloudStatus(false);
-            } catch(e) {
-                window.updateCloudStatus(false, "儲存失敗");
-            }
+            } catch(e) { window.updateCloudStatus(false, "儲存失敗"); }
         };
 
         window.deleteScriptFromCloud = async function(itemId) {
@@ -1364,9 +1378,7 @@
             try {
                 await deleteDoc(doc(db, 'users', user.uid, 'scripts', itemId));
                 window.updateCloudStatus(false);
-            } catch(e) {
-                window.updateCloudStatus(false, "刪除失敗");
-            }
+            } catch(e) { window.updateCloudStatus(false, "刪除失敗"); }
         };
 
         window.exportOfflineBackup = function() {
@@ -1405,34 +1417,25 @@
                     localStorage.setItem(HISTORY_KEY, JSON.stringify(localHistory));
                     window.loadHistory();
                     window.showConfirm(`成功載入並雲端同步 ${addedCount} 筆腳本紀錄！`, null);
-                } catch(err) {
-                    window.showError("載入失敗：檔案格式不正確");
-                }
+                } catch(err) { window.showError("載入失敗：檔案格式不正確"); }
             };
             reader.readAsText(file);
             event.target.value = '';
         };
 
-        window.loadHistory = function() {
-            window.searchHistory(); 
-        };
+        window.loadHistory = function() { window.searchHistory(); };
 
         window.searchHistory = function() {
             const searchInput = document.getElementById('historySearchInput');
             const keyword = searchInput ? searchInput.value.toLowerCase() : '';
             const history = JSON.parse(localStorage.getItem(HISTORY_KEY) || '[]');
-            
-            const filtered = history.filter(item => 
-                (item.title || '').toLowerCase().includes(keyword) || 
-                (item.date || '').includes(keyword)
-            );
+            const filtered = history.filter(item => (item.title || '').toLowerCase().includes(keyword) || (item.date || '').includes(keyword));
 
             const historyListEl = document.getElementById('historyList');
             if (filtered.length === 0) {
                 historyListEl.innerHTML = '<div class="text-center py-4 text-xs text-slate-400">尚無紀錄或找不到相符的腳本</div>';
                 return;
             }
-            
             historyListEl.innerHTML = filtered.map((item) => `
                 <div class="flex items-center justify-between p-3 bg-slate-50 border border-slate-200 rounded-xl hover:border-slate-300 transition-all group">
                     <div class="flex-1 min-w-0 cursor-pointer" onclick="loadHistoryScript('${item.id}')">
@@ -1453,13 +1456,7 @@
             let history = JSON.parse(localStorage.getItem(HISTORY_KEY) || '[]');
             const now = new Date();
             const dateStr = `${now.getMonth()+1}/${now.getDate()} ${now.getHours().toString().padStart(2, '0')}:${now.getMinutes().toString().padStart(2, '0')}`;
-            const newItem = { 
-                id: crypto.randomUUID(),
-                title: data.title || "未命名腳本", 
-                date: dateStr, 
-                timestamp: now.toISOString(),
-                data: data 
-            };
+            const newItem = { id: crypto.randomUUID(), title: data.title || "未命名腳本", date: dateStr, timestamp: now.toISOString(), data: data };
             history.unshift(newItem);
             if (history.length > 20) history = history.slice(0, 20);
             localStorage.setItem(HISTORY_KEY, JSON.stringify(history));
@@ -1484,7 +1481,6 @@
                 if (index !== -1) {
                     const item = history[index];
                     if(item && item.id) await window.deleteScriptFromCloud(item.id);
-                    
                     history.splice(index, 1);
                     localStorage.setItem(HISTORY_KEY, JSON.stringify(history));
                     window.loadHistory();
@@ -1509,7 +1505,6 @@
             }
         }
 
-        // File handling
         if(dropZone) {
             dropZone.onclick = () => fileInput.click();
             dropZone.ondragover = (e) => { e.preventDefault(); dropZone.classList.add('border-slate-800'); };
@@ -1520,15 +1515,12 @@
                 window.handleFiles(e.dataTransfer.files);
             };
         }
-        if(fileInput) {
-            fileInput.onchange = (e) => window.handleFiles(e.target.files);
-        }
+        if(fileInput) { fileInput.onchange = (e) => window.handleFiles(e.target.files); }
 
         window.addLink = function() {
             const linkInput = document.getElementById('linkInput');
             const url = linkInput.value.trim();
             if(!url) return;
-            
             const id = Math.random().toString(36).substr(2, 9);
             uploadedLinks.push({ id, url: url });
             linkInput.value = '';
@@ -1544,10 +1536,7 @@
             return new Promise((resolve) => {
                 const media = document.createElement(file.type.startsWith('audio/') ? 'audio' : 'video');
                 media.preload = 'metadata';
-                media.onloadedmetadata = function() {
-                    URL.revokeObjectURL(media.src);
-                    resolve(media.duration);
-                };
+                media.onloadedmetadata = function() { URL.revokeObjectURL(media.src); resolve(media.duration); };
                 media.onerror = function() { resolve(0); }
                 media.src = URL.createObjectURL(file);
             });
@@ -1562,25 +1551,18 @@
 
                 try {
                     let content = "";
-                    if (file.type === 'text/plain') {
-                        content = await file.text();
-                    } else if (file.type === 'application/pdf') {
-                        content = await window.extractPDFText(file);
-                    } else if (file.type === 'application/vnd.openxmlformats-officedocument.wordprocessingml.document') {
-                        content = await window.extractWordText(file);
-                    } else if (file.type.startsWith('image/')) {
+                    if (file.type === 'text/plain') { content = await file.text(); } 
+                    else if (file.type === 'application/pdf') { content = await window.extractPDFText(file); } 
+                    else if (file.type === 'application/vnd.openxmlformats-officedocument.wordprocessingml.document') { content = await window.extractWordText(file); } 
+                    else if (file.type.startsWith('image/')) {
                         content = await window.fileToBase64(file); 
-                        fileObj.isImage = true;
-                        fileObj.base64 = content;
+                        fileObj.isImage = true; fileObj.base64 = content;
                         content = `[圖片檔案：${file.name}]`;
                     } else if (file.type.startsWith('audio/') || file.type.startsWith('video/')) {
                         if (file.size > 20 * 1024 * 1024) {
-                            window.showError(`檔案 ${file.name} 過大！前端直連 API 限制為 20MB 內，請改用 YouTube 連結。`);
-                            fileObj.status = 'error';
-                            window.renderFileList();
-                            continue;
+                            window.showError(`檔案 ${file.name} 過大！前端直連 API 限制為 20MB 內，請改用連結。`);
+                            fileObj.status = 'error'; window.renderFileList(); continue;
                         }
-                        
                         const duration = await window.getMediaDuration(file);
                         if (duration > 0) {
                             const lengthInput = document.getElementById('videoLength');
@@ -1590,25 +1572,17 @@
                             lengthInput.value = Math.round(duration);
                             lengthInput.classList.add('border-green-400', 'bg-green-50/30');
                             statusBadge.classList.remove('hidden');
-                            
                             if (styleSelect.value !== '音樂MV風格' && file.type.startsWith('audio/')) {
                                 styleSelect.value = '音樂MV風格';
                                 window.toggleCustomStyle();
                             }
                             lucide.createIcons();
                         }
-
                         content = await window.fileToBase64(file); 
-                        fileObj.isMedia = true; 
-                        fileObj.base64 = content;
-                        fileObj.mimeType = file.type;
+                        fileObj.isMedia = true; fileObj.base64 = content; fileObj.mimeType = file.type;
                         content = `[影音檔案：${file.name}，時長：${Math.round(duration)}秒]`;
                     }
-                    
-                    if (fileObj.status !== 'error') {
-                        fileObj.content = content;
-                        fileObj.status = 'ready';
-                    }
+                    if (fileObj.status !== 'error') { fileObj.content = content; fileObj.status = 'ready'; }
                 } catch (err) { fileObj.status = 'error'; }
                 window.renderFileList();
             }
@@ -1621,34 +1595,20 @@
                 if (f.type.startsWith('audio/')) icon = 'music';
                 if (f.type.startsWith('video/')) icon = 'video';
                 
-                return `
-                <div class="flex items-center justify-between p-2.5 bg-slate-50 border border-slate-200 rounded-lg group">
-                    <div class="flex items-center gap-2 overflow-hidden">
-                        <i data-lucide="${icon}" class="w-4 h-4 text-slate-400 shrink-0"></i>
-                        <span class="text-xs truncate text-slate-600 font-medium">${f.name}</span>
-                    </div>
+                return `<div class="flex items-center justify-between p-2.5 bg-slate-50 border border-slate-200 rounded-lg group">
+                    <div class="flex items-center gap-2 overflow-hidden"><i data-lucide="${icon}" class="w-4 h-4 text-slate-400 shrink-0"></i><span class="text-xs truncate text-slate-600 font-medium">${f.name}</span></div>
                     <div class="flex items-center gap-2">
                         ${f.status === 'processing' ? '<div class="w-3 h-3 border-2 border-slate-300 border-t-slate-600 rounded-full animate-spin"></div>' : ''}
                         ${f.status === 'ready' ? '<i data-lucide="check-circle" class="w-3.5 h-3.5 text-green-500"></i>' : ''}
                         ${f.status === 'error' ? '<i data-lucide="x-circle" class="w-3.5 h-3.5 text-red-500"></i>' : ''}
                         <button onclick="removeFile('${f.id}')" class="p-1 hover:bg-slate-200 rounded text-slate-400 hover:text-red-500 transition-colors"><i data-lucide="trash-2" class="w-3.5 h-3.5"></i></button>
-                    </div>
-                </div>`;
+                    </div></div>`;
             }).join('');
             
-            html += uploadedLinks.map(l => `
-                <div class="flex items-center justify-between p-2.5 bg-indigo-50 border border-indigo-100 rounded-lg group">
-                    <div class="flex items-center gap-2 overflow-hidden">
-                        <i data-lucide="link" class="w-4 h-4 text-indigo-400 shrink-0"></i>
-                        <a href="${l.url}" target="_blank" class="text-xs truncate text-indigo-600 font-medium hover:underline">${l.url}</a>
-                    </div>
-                    <div class="flex items-center gap-2">
-                        <i data-lucide="check-circle" class="w-3.5 h-3.5 text-green-500"></i>
-                        <button onclick="removeLink('${l.id}')" class="p-1 hover:bg-indigo-200 rounded text-indigo-400 hover:text-red-500 transition-colors"><i data-lucide="trash-2" class="w-3.5 h-3.5"></i></button>
-                    </div>
-                </div>
-            `).join('');
-
+            html += uploadedLinks.map(l => `<div class="flex items-center justify-between p-2.5 bg-indigo-50 border border-indigo-100 rounded-lg group">
+                    <div class="flex items-center gap-2 overflow-hidden"><i data-lucide="link" class="w-4 h-4 text-indigo-400 shrink-0"></i><a href="${l.url}" target="_blank" class="text-xs truncate text-indigo-600 font-medium hover:underline">${l.url}</a></div>
+                    <div class="flex items-center gap-2"><i data-lucide="check-circle" class="w-3.5 h-3.5 text-green-500"></i><button onclick="removeLink('${l.id}')" class="p-1 hover:bg-indigo-200 rounded text-indigo-400 hover:text-red-500 transition-colors"><i data-lucide="trash-2" class="w-3.5 h-3.5"></i></button></div>
+                </div>`).join('');
             fileListDisplay.innerHTML = html;
             lucide.createIcons();
         }
@@ -1713,7 +1673,9 @@
             const aspectRatio = document.getElementById('aspectRatio').value;
             const rawScriptStyle = document.getElementById('scriptStyle').value;
             const scriptStyle = rawScriptStyle === '其他' ? (document.getElementById('customScriptStyle').value || '綜合風格') : rawScriptStyle;
-            const artStyle = document.getElementById('artStyle').value;
+            const artStyleSelect = document.getElementById('artStyle');
+            const artStyle = artStyleSelect.options[artStyleSelect.selectedIndex].text; 
+            const narrativeFramework = document.getElementById('narrativeFramework').value;
 
             const btn = document.getElementById('genBtn');
             document.getElementById('emptyState').classList.add('hidden');
@@ -1732,53 +1694,58 @@
             const linksText = uploadedLinks.length > 0 ? "參考網頁與影音連結：\n" + uploadedLinks.map(l => l.url).join("\n") : "";
 
             let platformTimeRules = "";
-            if (selectedPlatform === 'Runway') platformTimeRules = "【Runway 專屬規則】：切分每個影片片段 (scenes) 的 duration 必須剛好為 10 秒。每個片段內允許設計多個不同的分鏡與攝影運鏡。";
-            else if (selectedPlatform === 'KLINGAI') platformTimeRules = "【KLINGAI 專屬規則】：切分每個影片片段 (scenes) 的 duration 極度彈性，請依據劇情張力自由設定為 3 秒到 15 秒之間。";
-            else if (selectedPlatform === 'Gemini Omni') platformTimeRules = "【Gemini Omni 專屬規則】：切分每個影片片段 (scenes) 的 duration 必須剛好為 10 秒。每個片段內允許設計多個不同的分鏡與攝影運鏡。";
-            else if (selectedPlatform === 'AIReel') platformTimeRules = "【AIReel 專屬規則】：切分每個影片片段 (scenes) 的 duration 必須為 5、8、10 或 15 秒其中之一。若該片段為劇情高潮或使用者為會員，可使用 15 秒；否則預設使用 5, 8, 10 秒。";
-            else if (selectedPlatform === 'Seedance') platformTimeRules = "【Seedance 專屬規則】：切分每個影片片段 (scenes) 的 duration 極度彈性，請設定為 0 到 15 秒之間。";
-            else if (selectedPlatform === 'Grok') platformTimeRules = "【Grok 專屬規則】：切分每個影片片段 (scenes) 的 duration 必須剛好為 6 秒 或 10 秒。每個片段內允許設計多個不同的分鏡與攝影運鏡。";
+            if (selectedPlatform === 'Runway') platformTimeRules = "【Runway 專屬規則】：切分每個片段 (scenes) 的 duration 必須剛好為 10 秒。";
+            else if (selectedPlatform === 'KLINGAI') platformTimeRules = "【KLINGAI 專屬規則】：duration 彈性，依劇情張力設定為 3 到 15 秒之間。";
+            else if (selectedPlatform === 'Gemini Omni') platformTimeRules = "【Gemini Omni 專屬規則】：duration 必須剛好為 10 秒。";
+            else if (selectedPlatform === 'AIReel') platformTimeRules = "【AIReel 專屬規則】：duration 必須為 5、8、10 或 15 秒其中之一。";
+            else if (selectedPlatform === 'Seedance') platformTimeRules = "【Seedance 專屬規則】：duration 彈性，設定為 0 到 15 秒之間。";
+            else if (selectedPlatform === 'Grok') platformTimeRules = "【Grok 專屬規則】：duration 必須剛好為 6 秒或 10 秒。";
 
             const trafficCodesStr = selectedTrafficCodes.length > 0 ? selectedTrafficCodes.join("、") : "無特別指定";
 
-            const prompt = `你現在是頂尖的影音競賽腳本顧問與電影級 MV 導演。請根據以下競賽簡章內容、上傳檔案、外部連結及使用者要求，撰寫一個極度詳盡、邏輯連貫的短影音或 MV 腳本。
+            // Prompt 重構: 注入 Few-Shot 與嚴格系統指令
+            const prompt = `你現在是頂尖的影音競賽腳本顧問與電影級 MV 導演。請根據以下資料撰寫一個詳盡、邏輯連貫的短影音或 MV 腳本。
             
-            [競賽簡章與參考資料]
+            [使用者設定]
+            - 影片總時長: ${videoLength} 秒
+            - 畫面比例: ${aspectRatio}
+            - 情緒風格: ${scriptStyle}
+            - 視覺風格: ${artStyle}
+            - 敘事骨架: ${narrativeFramework}
+            - 目標平台: ${selectedPlatform} (${platformTimeRules})
+            - 流量密碼: ${trafficCodesStr}
+            - 補充說明: ${additionalReq || '無'}
+            
+            [資料]
             ${textContents}
             ${linksText}
             
-            [使用者設定 - 絕對嚴格遵守]
-            - 影片總時長: ${videoLength} 秒
-            - 影片畫面比例: ${aspectRatio}
-            - 影片腳本情緒風格: ${scriptStyle}
-            - 繪畫視覺風格: ${artStyle}
-            - 流量密碼 (爆款行銷心理學): ${trafficCodesStr}
-            - 目標生成平台: ${selectedPlatform}
-            - 腳本需求補充說明 (極重要核心觀點): ${additionalReq || '無特別補充'}
-            
-            [腳本結構與極致專業要求]
-            1. **【最高指導原則：音樂 MV 鎖定模式】**
-                若使用者風格選擇「音樂MV風格」，或有上傳 MP3/提供音樂連結，這代表**「這是一首已經創作好的原創音樂」**。
-                - **絕對禁止修改歌詞**：請完美辨識出音檔內的歌詞，並原封不動地填入對應分鏡的 \`subtitle\` 中。
-                - **絕對配合音樂節奏**：背景畫面的切換必須完全依附音樂的節拍與段落 (前奏、主歌、副歌、間奏、尾奏)。
-                - 總分鏡時間加總必須完美吻合總時長 ${videoLength} 秒。
-            2. 短影音黃金架構策略 (極度重要)：
-                請將使用者的「腳本需求補充說明」與「流量密碼 (${trafficCodesStr})」深度融合，並將影片嚴格劃分為四個黃金階段。請在 \`narrativeStructure\` 中詳細寫出這四個階段的具體策略，並特別註明是如何應用所選的流量密碼：
-                - HOOK (開頭前 3-5 秒)：如何瞬間抓住眼球、製造痛點或強烈共鳴。
-                - 承接 (Development)：如何展開主題、帶入情境或主角困境。
-                - 轉折 (Turn)：如何製造懸念、提出核心知識點或顛覆性解決方案 (若是MV，此處為副歌視覺高潮)。
-                - CTA (呼籲與金句)：結尾的行動呼籲，並務必留下一句讓人印象深刻的金句總結。
-            3. 前置視覺設定集 (Visual Bible)：
-                在分鏡開始前，先定義：
-                - 每一位主角的「定裝圖 Prompt」：明確包含「角色設定圖 (Character design sheet)」、「全身的正面、側面、背面 (full-body front, side, and back views)」、「6種臉部表情 (6 facial expressions)」，強制加入「使用純白背景 (pure white background)」，並強烈展現「${artStyle}」視覺風格。此定裝部分請一律強制要求「16:9 橫式畫面比例 (--ar 16:9 或 16:9 aspect ratio)」。
-                - 每一個關鍵場景的「概念圖 Prompt」：極度詳盡描述光影、建築、氛圍，必須符合「${artStyle}」風格，並同樣強制要求「16:9 橫式畫面比例 (16:9 aspect ratio)」。若有文字，強制「僅限使用英文 (English text only)」。
-            4. 專業配樂指導 (Suno AI Prompt)：
-                提供 \`overallBgmPrompt\`：這是一段給 Suno AI 的全片完整背景音樂英文提示詞，需精準判斷腳本氛圍。針對後續【每一個分鏡】，請在 \`sunoPrompt\` 欄位中填寫該段落專屬的「英文音樂情緒變化提示詞」。
-            5. SMART 平台時間模組 (絕對嚴格遵守)：
-                ${platformTimeRules}
-            6. 視覺與腳本高度一致性 (策略落地)：
-                該分鏡裡的「視覺分鏡 Visuals」、主角與環境設定，必須與「前置視覺設定集」完全對應。分鏡的 Prompt 必須標示「${artStyle}」風格與使用者指定的「${aspectRatio}」影片比例。
-            7. 輸出格式 (嚴格防呆指令): 請務必以 JSON 格式輸出。**絕對禁止省略任何欄位，每一個 JSON 鍵值都必須完整提供具體內容，絕不允許輸出 null 或空白！**`;
+            【系統強制指令與輸出規範 - 絕對嚴格遵守】
+            1. 你必須只回傳合法的 JSON 字串，不要包含任何 Markdown 標記 (如 \`\`\`json)，不要包含任何開場白或結尾語。
+            2. JSON 結構必須 100% 吻合定義。所有鍵值不可省略，不可為 null。
+            3. 音樂 MV 模式下，嚴禁修改歌詞，必須配合音樂節奏切換分鏡，時間總和必須等於 ${videoLength} 秒。
+            4. 必須將「${narrativeFramework}」的精髓套用至 JSON 的 narrativeStructure (hook/development/turn/cta) 中，並完美融入選擇的流量密碼。
+
+            【Few-Shot 結構化範例參考】
+            {
+              "title": "範例標題",
+              "summary": "範例摘要說明",
+              "overallBgmPrompt": "Epic cinematic orchestral track, rising tension...",
+              "visualAssets": {
+                "characters": [ { "name": "主角A", "designPromptZh": "主角設定中文描述", "designPromptEn": "Character design sheet in pure white background, 16:9 aspect ratio..." } ],
+                "environments": [ { "name": "主場景", "designPromptZh": "場景中文描述", "designPromptEn": "Detailed environment concept art, 16:9 aspect ratio..." } ]
+              },
+              "narrativeStructure": { "hook": "開場吸引策略", "development": "展開策略", "turn": "轉折策略", "cta": "行動呼籲策略" },
+              "scenes": [
+                {
+                  "sceneNumber": 1, "narrativeStage": "1. HOOK (吸引)", "duration": 5, "element": "開場鏡頭",
+                  "visualDescription": "畫面具體視覺描述", "protagonist": "主角A", "setting": "主場景", "camera": "推軌特寫",
+                  "audio": "口白內容", "music": "風聲、懸疑音效", "subtitle": "字幕內容", 
+                  "sunoPrompt": "Suspenseful intro beat", "platformPrompt": "Camera pans slowly, 4k highly detailed...",
+                  "imagePromptZh": "中文靜態圖提示", "imagePromptEn": "English static image prompt..."
+                }
+              ]
+            }`;
 
             const parts = [{ text: prompt }];
             images.forEach(img => { parts.push({ inlineData: { mimeType: img.type, data: img.base64 } }); });
@@ -1791,34 +1758,20 @@
                     responseSchema: {
                         type: "OBJECT",
                         properties: {
-                            title: { type: "STRING" },
-                            summary: { type: "STRING" },
-                            overallBgmPrompt: { type: "STRING" },
+                            title: { type: "STRING" }, summary: { type: "STRING" }, overallBgmPrompt: { type: "STRING" },
                             visualAssets: {
                                 type: "OBJECT",
                                 properties: {
-                                    characters: {
-                                        type: "ARRAY",
-                                        items: { type: "OBJECT", properties: { name: { type: "STRING" }, designPromptZh: { type: "STRING" }, designPromptEn: { type: "STRING" } }, required: ["name", "designPromptZh", "designPromptEn"] }
-                                    },
-                                    environments: {
-                                        type: "ARRAY",
-                                        items: { type: "OBJECT", properties: { name: { type: "STRING" }, designPromptZh: { type: "STRING" }, designPromptEn: { type: "STRING" } }, required: ["name", "designPromptZh", "designPromptEn"] }
-                                    }
+                                    characters: { type: "ARRAY", items: { type: "OBJECT", properties: { name: { type: "STRING" }, designPromptZh: { type: "STRING" }, designPromptEn: { type: "STRING" } }, required: ["name", "designPromptZh", "designPromptEn"] } },
+                                    environments: { type: "ARRAY", items: { type: "OBJECT", properties: { name: { type: "STRING" }, designPromptZh: { type: "STRING" }, designPromptEn: { type: "STRING" } }, required: ["name", "designPromptZh", "designPromptEn"] } }
                                 }
                             },
-                            narrativeStructure: {
-                                type: "OBJECT",
-                                properties: { hook: { type: "STRING" }, development: { type: "STRING" }, turn: { type: "STRING" }, cta: { type: "STRING" } },
-                                required: ["hook", "development", "turn", "cta"]
-                            },
+                            narrativeStructure: { type: "OBJECT", properties: { hook: { type: "STRING" }, development: { type: "STRING" }, turn: { type: "STRING" }, cta: { type: "STRING" } }, required: ["hook", "development", "turn", "cta"] },
                             scenes: {
                                 type: "ARRAY",
                                 items: {
                                     type: "OBJECT",
-                                    properties: {
-                                        sceneNumber: { type: "NUMBER" }, narrativeStage: { type: "STRING" }, duration: { type: "NUMBER" }, element: { type: "STRING" }, visualDescription: { type: "STRING" }, protagonist: { type: "STRING" }, setting: { type: "STRING" }, camera: { type: "STRING" }, audio: { type: "STRING" }, music: { type: "STRING" }, subtitle: { type: "STRING" }, sunoPrompt: { type: "STRING" }, platformPrompt: { type: "STRING" }, imagePromptZh: { type: "STRING" }, imagePromptEn: { type: "STRING" }
-                                    },
+                                    properties: { sceneNumber: { type: "NUMBER" }, narrativeStage: { type: "STRING" }, duration: { type: "NUMBER" }, element: { type: "STRING" }, visualDescription: { type: "STRING" }, protagonist: { type: "STRING" }, setting: { type: "STRING" }, camera: { type: "STRING" }, audio: { type: "STRING" }, music: { type: "STRING" }, subtitle: { type: "STRING" }, sunoPrompt: { type: "STRING" }, platformPrompt: { type: "STRING" }, imagePromptZh: { type: "STRING" }, imagePromptEn: { type: "STRING" } },
                                     required: ["sceneNumber", "narrativeStage", "duration", "element", "visualDescription", "protagonist", "setting", "camera", "audio", "music", "subtitle", "sunoPrompt", "platformPrompt", "imagePromptZh", "imagePromptEn"]
                                 }
                             }
@@ -1829,9 +1782,9 @@
             };
 
             try {
-                // 升級至 3.5 Flash 端點
-                const response = await window.callGeminiWithRetry(apiKey, payload);
-                response.trafficCodes = selectedTrafficCodes; // 將流量密碼存入歷史資料中
+                // 呼叫具備防呆機制的 Retry Pipeline
+                const response = await window.callGeminiWithRetry(apiKey, payload, false, false);
+                response.trafficCodes = selectedTrafficCodes; 
                 
                 window.saveToHistory(response); 
                 window.displayScript(response);
@@ -1851,31 +1804,8 @@
             } finally {
                 clearInterval(timerInterval);
                 document.getElementById('loadingState').classList.add('hidden');
+                document.getElementById('loadingMainText').textContent = "Gemini 3.8 Flash 深度推理中，依據平台特性建構分鏡";
                 btn.disabled = false;
-            }
-        };
-
-        window.callGeminiWithRetry = async function(apiKey, payload, retries = 2) {
-            for (let i = 0; i < retries; i++) {
-                try {
-                    const res = await fetch(`https://generativelanguage.googleapis.com/v1beta/models/gemini-3.8-flash:generateContent?key=${apiKey}`, {
-                        method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify(payload)
-                    });
-                    const data = await res.json();
-                    if (!res.ok) {
-                        if (res.status === 400 || res.status === 403) throw new Error(`[致命錯誤] 伺服器拒絕 (代碼 ${res.status}): ${data.error?.message || "請檢查您的 API Key 是否有效。"}`);
-                        throw new Error(data.error?.message || "伺服器繁忙");
-                    }
-                    const textResponse = data.candidates[0].content.parts[0].text;
-                    try {
-                        let cleaned = textResponse.replace(/```json/gi, '').replace(/```/g, '').trim();
-                        return JSON.parse(cleaned);
-                    } catch (parseErr) { throw new Error(`[致命錯誤] AI 產出的格式無法解析。建議縮短影片時長或減少細節要求。`); }
-                } catch (err) {
-                    if (err.message.includes('[致命錯誤]')) throw new Error(err.message.replace('[致命錯誤] ', ''));
-                    if (i === retries - 1) throw err;
-                    await new Promise(r => setTimeout(r, Math.pow(2, i) * 1500));
-                }
             }
         };
 
@@ -1901,15 +1831,16 @@
             let narrativeHTML = '';
             if (data.narrativeStructure) {
                 const stageMap = { hook: { title: '1. HOOK (吸引)', color: 'border-l-rose-500', bg: 'bg-rose-50', text: 'text-rose-900', icon: 'zap' }, development: { title: '2. 承接 (展開)', color: 'border-l-blue-500', bg: 'bg-blue-50', text: 'text-blue-900', icon: 'trending-up' }, turn: { title: '3. 轉折 (懸念/知識點)', color: 'border-l-amber-500', bg: 'bg-amber-50', text: 'text-amber-900', icon: 'lightbulb' }, cta: { title: '4. CTA (呼籲與金句)', color: 'border-l-emerald-500', bg: 'bg-emerald-50', text: 'text-emerald-900', icon: 'megaphone' } };
-                narrativeHTML = `<div class="bg-white rounded-2xl p-6 shadow-sm border border-slate-200 mb-6"><div class="flex items-center gap-2 mb-4"><i data-lucide="layout-template" class="w-6 h-6 text-slate-800"></i><h3 class="text-lg font-bold text-slate-800">📋 短影音黃金架構策略</h3></div><p class="text-xs text-slate-500 mb-4 font-medium">基於您的「核心觀點補充說明」所建構的故事脈絡</p><div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+                narrativeHTML = `<div class="bg-white rounded-2xl p-6 shadow-sm border border-slate-200 mb-6"><div class="flex items-center gap-2 mb-4"><i data-lucide="layout-template" class="w-6 h-6 text-slate-800"></i><h3 class="text-lg font-bold text-slate-800">📋 短影音商業敘事骨架策略</h3></div><p class="text-xs text-slate-500 mb-4 font-medium">基於「${document.getElementById('narrativeFramework').value.split(' ')[0]}」建構的故事脈絡</p><div class="grid grid-cols-1 md:grid-cols-2 gap-4">
                 ${Object.entries(data.narrativeStructure).map(([key, val]) => { const config = stageMap[key] || { title: key, color: 'border-l-slate-500', bg: 'bg-slate-50', text: 'text-slate-900', icon: 'file-text' }; return `<div class="${config.bg} p-4 rounded-xl border-l-4 ${config.color} shadow-sm"><div class="flex items-center gap-2 mb-2"><i data-lucide="${config.icon}" class="w-4 h-4 ${config.text} opacity-70"></i><p class="text-xs font-black ${config.text} uppercase tracking-widest">${config.title}</p></div><p class="text-sm font-medium text-slate-700 leading-snug">${val || '無特定策略'}</p></div>`; }).join('')}
                 </div></div>`;
             }
 
             const trafficCodesDisplay = (data.trafficCodes && data.trafficCodes.length > 0) ? data.trafficCodes.join(" / ") : "";
             const trafficTagsHtml = trafficCodesDisplay ? `<span class="bg-rose-500 text-white text-xs px-2 py-0.5 rounded font-bold uppercase tracking-wider shadow-sm"><i data-lucide="zap" class="w-3 h-3 inline-block mr-1 mb-0.5"></i>${trafficCodesDisplay}</span>` : "";
+            const frameworkHtml = `<span class="bg-blue-500 text-white text-xs px-2 py-0.5 rounded font-bold uppercase tracking-wider shadow-sm"><i data-lucide="book-open" class="w-3 h-3 inline-block mr-1 mb-0.5"></i>${document.getElementById('narrativeFramework').value.split(' ')[0]}</span>`;
 
-            container.innerHTML = `<div class="bg-slate-800 text-white p-6 rounded-2xl shadow-inner relative overflow-hidden mb-6"><div class="flex items-center gap-2 mb-2 relative z-10 flex-wrap"><span class="bg-slate-700 text-slate-300 text-xs px-2 py-0.5 rounded font-bold uppercase tracking-wider">${scriptStyle}</span><span class="bg-amber-500 text-amber-900 text-xs px-2 py-0.5 rounded font-bold uppercase tracking-wider">${selectedPlatform}</span>${trafficTagsHtml}</div><h2 class="text-2xl font-bold mb-2 relative z-10">${data.title || '未命名腳本'}</h2><p class="text-slate-300 text-sm leading-relaxed relative z-10">${data.summary || "專業競賽腳本已生成。"}</p><div class="absolute -right-8 -top-8 text-white/5"><i data-lucide="quote" class="w-32 h-32"></i></div></div>
+            container.innerHTML = `<div class="bg-slate-800 text-white p-6 rounded-2xl shadow-inner relative overflow-hidden mb-6"><div class="flex items-center gap-2 mb-2 relative z-10 flex-wrap"><span class="bg-slate-700 text-slate-300 text-xs px-2 py-0.5 rounded font-bold uppercase tracking-wider">${scriptStyle}</span><span class="bg-amber-500 text-amber-900 text-xs px-2 py-0.5 rounded font-bold uppercase tracking-wider">${selectedPlatform}</span>${frameworkHtml}${trafficTagsHtml}</div><h2 class="text-2xl font-bold mb-2 relative z-10">${data.title || '未命名腳本'}</h2><p class="text-slate-300 text-sm leading-relaxed relative z-10">${data.summary || "專業競賽腳本已生成。"}</p><div class="absolute -right-8 -top-8 text-white/5"><i data-lucide="quote" class="w-32 h-32"></i></div></div>
                 ${sunoHTML}${narrativeHTML}${visualAssetsHTML}
                 <div class="space-y-6">
                     ${data.scenes.map(s => {
